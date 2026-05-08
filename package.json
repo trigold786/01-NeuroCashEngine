@@ -1,16 +1,25 @@
 {
   "name": "01-neurocashengine",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "description": "NeuroCashEngine - 智能现金增值与管理平台",
   "scripts": {
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "restart": "docker-compose restart",
+    "logs": "docker-compose logs -f",
+    "build:all": "docker-compose build",
+    "dev:backend": "cd backend/shared/account-center && npm run start:dev",
+    "dev:frontend": "cd frontend/apps/pwa && npm run dev",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "keywords": [
+    "neurocash",
+    "cashflow",
+    "investment"
+  ],
+  "author": "NeuroCashEngine Team",
+  "license": "ISC"
 }
