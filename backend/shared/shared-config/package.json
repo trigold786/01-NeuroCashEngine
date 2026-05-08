@@ -1,0 +1,17 @@
+{
+  "name": "@nce/shared-config",
+  "version": "1.0.0",
+  "description": "NeuroCashEngine shared config",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "@nestjs/typeorm": "^11.0.0",
+    "typeorm": "^0.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.0"
+  }
+}
