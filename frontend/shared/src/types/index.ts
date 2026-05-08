@@ -32,12 +32,7 @@ export interface AuthResponse {
 }
 
 // C端资产相关类型
-export enum AssetAccountType {
-  CASH = 'CASH',
-  DEPOSIT = 'DEPOSIT',
-  FUND = 'FUND',
-  STOCK = 'STOCK',
-}
+export type AssetAccountType = 'CASH' | 'DEPOSIT' | 'FUND' | 'STOCK';
 
 export interface UserAssetAccount {
   id: string;
@@ -49,13 +44,15 @@ export interface UserAssetAccount {
   authStatus: number;
   lastSyncTime?: Date;
   accountName?: string;
+  accountTypeName?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface AssetOverview {
   total: number;
-  distribution: Record<AssetAccountType, number>;
+  distribution: Record<string, number>;
+  chartData: Array<{ name: string; value: number; percentage: string }>;
   accountCount: number;
   accounts: UserAssetAccount[];
 }

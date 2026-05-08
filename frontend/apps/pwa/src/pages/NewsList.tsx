@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNewsStore, NewsCategory, NewsSourceType, News } from '@nce/shared';
 
 interface NewsListProps {
@@ -8,24 +8,31 @@ interface NewsListProps {
 
 export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps) {
   const { newsList, loading, error, fetchNewsList } = useNewsStore();
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedSource, setSelectedSource] = useState<string>('');
+  const [keyword, setKeyword] = useState('');
+  const [categories, setCategories] = useState<{ key: string; label: string }[]>([]);
 
   useEffect(() => {
-    fetchNewsList();
-  }, [fetchNewsList]);
+    // 模拟获取分类数据
+    setCategories([
+      { key: '', label: '全部' },
+      { key: NewsCategory.GENERAL, label: '综合' },
+      { key: NewsCategory.STOCK, label: '股票' },
+      { key: NewsCategory.FUND, label: '基金' },
+      { key: NewsCategory.BOND, label: '债券' },
+      { key: NewsCategory.MACRO, label: '宏观' },
+    ]);
+  }, []);
 
-  const getSourceTypeLabel = (type: NewsSourceType) => {
+  useEffect(() => {
+    const categoryValue = selectedCategory ? (selectedCategory as NewsCategory) : undefined;
+    const sourceValue = selectedSource ? (selectedSource as NewsSourceType) : undefined;
+    fetchNewsList({ category: categoryValue, sourceType: sourceValue, keyword: keyword || undefined });
+  }, [fetchNewsList, selectedCategory, selectedSource, keyword]);
+
+  const getSourceTypeLabel = (type: NewsSourceType): string => {
     return type === NewsSourceType.OFFICIAL ? '官方' : '已验证';
-  };
-
-  const getCategoryLabel = (category: NewsCategory) => {
-    const labels: Record<NewsCategory, string> = {
-      [NewsCategory.GENERAL]: '综合',
-      [NewsCategory.STOCK]: '股票',
-      [NewsCategory.FUND]: '基金',
-      [NewsCategory.BOND]: '债券',
-      [NewsCategory.MACRO]: '宏观',
-    };
-    return labels[category];
   };
 
   const handleNewsClick = (news: News) => {
@@ -34,7 +41,7 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
       <div style={{ marginBottom: '24px' }}>
         <button
           onClick={() => navigateTo('dashboard')}
@@ -45,12 +52,74 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
             padding: '8px 16px',
             cursor: 'pointer',
             color: '#666',
-            marginBottom: '8px'
+            marginBottom: '12px'
           }}
         >
           ← 返回控制台
         </button>
-        <h1>资讯中心</h1>
+        <h1 style={{ margin: '0 0 16px 0' }}>资讯中心</h1>
+
+        {/* 筛选区 */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap' as const,
+          gap: '12px',
+          padding: '16px',
+          background: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+        }}>
+          {/* 搜索框 */}
+          <div style={{ flex: 1, minWidth: '240px' }}>
+            <input
+              type="text"
+              placeholder="搜索资讯..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: '4px',
+                border: '1px solid #ddd',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+
+          {/* 分类筛选 */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            style={{
+              padding: '10px 14px',
+              borderRadius: '4px',
+              border: '1px solid #ddd',
+              fontSize: '14px',
+              minWidth: '120px'
+            }}
+          >
+            {categories.map(cat => (
+              <option key={cat.key} value={cat.key}>{cat.label}</option>
+            ))}
+          </select>
+
+          {/* 来源筛选 */}
+          <select
+            value={selectedSource}
+            onChange={(e) => setSelectedSource(e.target.value)}
+            style={{
+              padding: '10px 14px',
+              borderRadius: '4px',
+              border: '1px solid #ddd',
+              fontSize: '14px',
+              minWidth: '120px'
+            }}
+          >
+            <option value="">全部来源</option>
+            <option value={NewsSourceType.OFFICIAL}>官方</option>
+            <option value={NewsSourceType.VERIFIED}>已验证</option>
+          </select>
+        </div>
       </div>
 
       {loading && <p style={{ textAlign: 'center', color: '#666' }}>加载中...</p>}
@@ -78,7 +147,7 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
               e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.08)';
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' as const }}>
               <span
                 style={{
                   padding: '2px 8px',
@@ -99,7 +168,7 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
                   color: '#666'
                 }}
               >
-                {getCategoryLabel(news.category)}
+                {categories.find(c => c.key === news.category)?.label || news.category}
               </span>
             </div>
 

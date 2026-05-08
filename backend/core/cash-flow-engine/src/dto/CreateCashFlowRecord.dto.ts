@@ -1,5 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsNumber, IsDateString, IsUUID } from 'class-validator';
-import { TradeType } from '../entities/CashFlowRecord.entity';
+import { IsString, IsOptional, IsNumber, IsDateString, IsUUID } from 'class-validator';
 
 export class CreateCashFlowRecordDto {
   @IsUUID()
@@ -11,8 +10,8 @@ export class CreateCashFlowRecordDto {
   @IsNumber()
   amount: number;
 
-  @IsEnum(TradeType)
-  tradeType: TradeType;
+  @IsString()
+  tradeType: string;
 
   @IsOptional()
   @IsString()

@@ -4,6 +4,7 @@ import { News, NewsCategory, NewsSourceType } from '../types';
 export interface GetNewsListParams {
   category?: NewsCategory;
   sourceType?: NewsSourceType;
+  keyword?: string;
   page?: number;
   limit?: number;
 }

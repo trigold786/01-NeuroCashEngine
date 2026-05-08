@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useAssetStore, AssetAccountType } from '@nce/shared';
+import { Doughnut } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface AssetOverviewProps {
   navigateTo: (page: string) => void;
 }
 
+const CHART_COLORS = ['#00cc66', '#0066cc', '#cc6600', '#cc0000'];
+
 export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
   const { overview, accounts, loading, error, fetchOverview, createAccount, deleteAccount } = useAssetStore();
   const [showAddModal, setShowAddModal] = useState(false);
   const [newAccount, setNewAccount] = useState({
-    accountType: AssetAccountType.CASH,
+    accountType: 'CASH',
     accountName: '',
     balance: 0,
     currency: 'CNY',
@@ -19,24 +30,14 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
     fetchOverview();
   }, [fetchOverview]);
 
-  const getAssetTypeLabel = (type: AssetAccountType) => {
-    const labels: Record<AssetAccountType, string> = {
-      [AssetAccountType.CASH]: '现金',
-      [AssetAccountType.DEPOSIT]: '存款',
-      [AssetAccountType.FUND]: '基金',
-      [AssetAccountType.STOCK]: '股票',
+  const getAssetTypeLabel = (type: string): string => {
+    const labels: Record<string, string> = {
+      'CASH': '现金',
+      'DEPOSIT': '存款',
+      'FUND': '基金',
+      'STOCK': '股票',
     };
-    return labels[type];
-  };
-
-  const getAssetTypeColor = (type: AssetAccountType) => {
-    const colors: Record<AssetAccountType, string> = {
-      [AssetAccountType.CASH]: '#00cc66',
-      [AssetAccountType.DEPOSIT]: '#0066cc',
-      [AssetAccountType.FUND]: '#cc6600',
-      [AssetAccountType.STOCK]: '#cc0000',
-    };
-    return colors[type];
+    return labels[type] || type;
   };
 
   const handleSubmitAdd = async (e: React.FormEvent) => {
@@ -44,7 +45,7 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
     await createAccount(newAccount);
     setShowAddModal(false);
     setNewAccount({
-      accountType: AssetAccountType.CASH,
+      accountType: 'CASH',
       accountName: '',
       balance: 0,
       currency: 'CNY',
@@ -57,13 +58,38 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
     }
   };
 
+  const chartData = overview?.chartData || [];
+  const data = {
+    labels: chartData.map(d => d.name),
+    datasets: [
+      {
+        label: '资产分布',
+        data: chartData.map(d => d.value),
+        backgroundColor: CHART_COLORS,
+        borderColor: '#fff',
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+      },
+    },
+  };
+
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '24px'
+        marginBottom: '24px',
+        flexWrap: 'wrap' as const,
+        gap: '12px'
       }}>
         <div>
           <button
@@ -80,7 +106,7 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
           >
             ← 返回控制台
           </button>
-          <h1>资产概览</h1>
+          <h1 style={{ margin: 0 }}>资产概览</h1>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
@@ -101,45 +127,62 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
       {loading && <p style={{ textAlign: 'center', color: '#666' }}>加载中...</p>}
       {error && <p style={{ color: '#cc0000', textAlign: 'center' }}>{error}</p>}
 
-      {/* 总资产概览 */}
       {overview && (
-        <div style={{
-          background: 'white',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-          marginBottom: '24px'
-        }}>
-          <h2>总资产</h2>
-          <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#0066cc' }}>
-            ¥{overview.total.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
-            {Object.entries(overview.distribution).map(([type, value]) => {
-              if (value === 0) return null;
-              const t = type as AssetAccountType;
-              return (
-                <div
-                  key={type}
-                  style={{
-                    flex: 1,
-                    minWidth: '150px',
-                    padding: '16px',
-                    border: '1px solid #eee',
-                    borderRadius: '8px',
-                    borderLeftWidth: '4px',
-                    borderLeftColor: getAssetTypeColor(t)
-                  }}
-                >
-                  <p style={{ color: '#666', marginBottom: '4px' }}>{getAssetTypeLabel(t)}</p>
-                  <p style={{ fontSize: '20px', fontWeight: 'bold' }}>
-                    ¥{value.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
+        <>
+          <div style={{
+            background: 'white',
+            padding: '24px',
+            borderRadius: '8px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            marginBottom: '24px'
+          }}>
+            <h2 style={{ marginTop: 0, marginBottom: '16px' }}>总资产</h2>
+            <p style={{ fontSize: '36px', fontWeight: 'bold', color: '#0066cc', margin: 0 }}>
+              ¥{overview.total.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+            <div style={{
+              background: 'white',
+              padding: '24px',
+              borderRadius: '8px',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            }}>
+              <h3 style={{ marginTop: 0 }}>资产配置</h3>
+              {chartData.length > 0 ? (
+                <div style={{ maxHeight: '300px' }}>
+                  <Doughnut data={data} options={options} />
+                </div>
+              ) : (
+                <p style={{ color: '#999', textAlign: 'center' }}>暂无资产数据</p>
+              )}
+            </div>
+
+            <div style={{
+              background: 'white',
+              padding: '24px',
+              borderRadius: '8px',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            }}>
+              <h3 style={{ marginTop: 0 }}>资产明细</h3>
+              {chartData.map((item, index) => (
+                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #eee' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }} />
+                    <div>
+                      <p style={{ margin: 0, fontWeight: '500' }}>{item.name}</p>
+                      <p style={{ margin: 0, color: '#666', fontSize: '12px' }}>{item.percentage}%</p>
+                    </div>
+                  </div>
+                  <p style={{ margin: 0, fontWeight: 'bold' }}>
+                    ¥{item.value.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
                   </p>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* 账户列表 */}
@@ -150,7 +193,7 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
         overflow: 'hidden'
       }}>
         <div style={{ padding: '16px 20px', borderBottom: '1px solid #eee' }}>
-          <h3>账户列表</h3>
+          <h3 style={{ margin: 0 }}>账户列表</h3>
         </div>
         <div style={{ padding: '0 20px' }}>
           {accounts.length === 0 ? (
@@ -159,9 +202,9 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
             </p>
           ) : (
             <div style={{ padding: '16px 0' }}>
-              {accounts.map((account) => (
+              {accounts.map((acc: any) => (
                 <div
-                  key={account.id}
+                  key={acc.id}
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -172,16 +215,16 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
                 >
                   <div>
                     <p style={{ fontSize: '16px', fontWeight: '500', marginBottom: '4px' }}>
-                      {account.accountName || getAssetTypeLabel(account.accountType)}
+                      {acc.accountName || acc.accountTypeName}
                     </p>
-                    <p style={{ color: '#666' }}>{getAssetTypeLabel(account.accountType)}</p>
+                    <p style={{ margin: 0, color: '#666' }}>{acc.accountTypeName}</p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#00cc66' }}>
-                      ¥{account.balance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
+                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#00cc66', margin: 0 }}>
+                      ¥{acc.balance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
                     </p>
                     <button
-                      onClick={() => handleDelete(account.id)}
+                      onClick={() => handleDelete(acc.id)}
                       style={{
                         background: '#fff5f5',
                         color: '#cc0000',
@@ -224,7 +267,7 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
             padding: '24px'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2>添加账户</h2>
+              <h2 style={{ margin: 0 }}>添加账户</h2>
               <button onClick={() => setShowAddModal(false)} style={{ fontSize: '24px', border: 'none', background: 'none', cursor: 'pointer' }}>×</button>
             </div>
 
@@ -233,12 +276,13 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
                 <label>账户类型</label>
                 <select
                   value={newAccount.accountType}
-                  onChange={(e) => setNewAccount({ ...newAccount, accountType: e.target.value as AssetAccountType })}
+                  onChange={(e) => setNewAccount({ ...newAccount, accountType: e.target.value })}
                   style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
                 >
-                  {Object.values(AssetAccountType).map(type => (
-                    <option key={type} value={type}>{getAssetTypeLabel(type)}</option>
-                  ))}
+                  <option value="CASH">现金</option>
+                  <option value="DEPOSIT">存款</option>
+                  <option value="FUND">基金</option>
+                  <option value="STOCK">股票</option>
                 </select>
               </div>
 

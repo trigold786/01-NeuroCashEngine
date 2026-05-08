@@ -1,9 +1,8 @@
-import { IsString, IsEnum, IsOptional, IsNumber, IsDateString } from 'class-validator';
-import { AccountType } from '../entities/UserAssetAccount.entity';
+import { IsString, IsOptional, IsNumber, IsDateString } from 'class-validator';
 
 export class CreateAssetAccountDto {
-  @IsEnum(AccountType)
-  accountType: AccountType;
+  @IsString()
+  accountType: string;
 
   @IsOptional()
   @IsString()

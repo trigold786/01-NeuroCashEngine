@@ -15,9 +15,8 @@ export class CashFlowService {
   ) {}
 
   async createRecord(userId: string, dto: CreateCashFlowRecordDto): Promise<CashFlowRecord> {
-    // 验证账户属于当前用户
     const account = await this.accountRepository.findOne({
-      where: { id: dto.accountId, userId },
+      where: { accountId: dto.accountId, userId },
     });
     if (!account) throw new NotFoundException('Account not found');
 
@@ -29,9 +28,8 @@ export class CashFlowService {
   }
 
   async getRecordsByAccount(accountId: string, userId: string): Promise<CashFlowRecord[]> {
-    // 验证账户属于当前用户
     const account = await this.accountRepository.findOne({
-      where: { id: accountId, userId },
+      where: { accountId: accountId, userId },
     });
     if (!account) throw new NotFoundException('Account not found');
 

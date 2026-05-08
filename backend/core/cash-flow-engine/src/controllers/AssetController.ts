@@ -6,7 +6,6 @@ import {
   Param,
   Body,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { AssetService } from '../services/AssetService';
 import { CreateAssetAccountDto } from '../dto/CreateAssetAccount.dto';
@@ -17,7 +16,7 @@ export class AssetController {
 
   @Get('overview')
   async getOverview(@Req() req: any) {
-    const userId = req.user?.id || 'demo-user-1'; // 临时使用demo id
+    const userId = req.user?.id || 'demo-user-1'; 
     return await this.assetService.getAssetOverview(userId);
   }
 
