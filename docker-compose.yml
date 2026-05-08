@@ -75,6 +75,38 @@ services:
     networks:
       - nce-network
 
+  cash-flow-engine:
+    build: ./backend/core/cash-flow-engine
+    container_name: nce-cash-flow-engine
+    ports:
+      - "3005:3005"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
+      - DB_NAME=nce_db
+    depends_on:
+      - mysql
+    networks:
+      - nce-network
+
+  content-hub:
+    build: ./backend/core/content-hub
+    container_name: nce-content-hub
+    ports:
+      - "3006:3006"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
+      - DB_NAME=nce_db
+    depends_on:
+      - mysql
+    networks:
+      - nce-network
+
 volumes:
   mysql-data:
   redis-data:

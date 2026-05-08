@@ -1,35 +1,47 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosInstance } from 'axios';
 
-const apiClient = axios.create({
-  baseURL: (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// 服务基础URL配置
+const SERVICE_BASE_URLS = {
+  ACCOUNT: (import.meta as any).env?.VITE_ACCOUNT_API_URL || 'http://localhost:3001',
+  CASHFLOW: (import.meta as any).env?.VITE_CASHFLOW_API_URL || 'http://localhost:3005',
+  CONTENT: (import.meta as any).env?.VITE_CONTENT_API_URL || 'http://localhost:3006',
+};
 
-// 请求拦截器：添加认证token
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('nce_access_token') : null;
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error: AxiosError) => Promise.reject(error),
-);
+// 创建通用API客户端工厂
+const createApiClient = (baseURL: string): AxiosInstance => {
+  const client = axios.create({
+    baseURL,
+    timeout: 10000,
+    headers: { 'Content-Type': 'application/json' },
+  });
 
-// 响应拦截器
-apiClient.interceptors.response.use(
-  (response) => response.data,
-  (error: AxiosError) => {
-    if (typeof window !== 'undefined' && error.response?.status === 401) {
-      localStorage.removeItem('nce_access_token');
-      window.location.href = '/';
-    }
-    return Promise.reject(error);
-  },
-);
+  client.interceptors.request.use(
+    (config) => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('nce_access_token') : null;
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error: AxiosError) => Promise.reject(error),
+  );
 
-export default apiClient;
+  client.interceptors.response.use(
+    (response) => response.data,
+    (error: AxiosError) => {
+      if (typeof window !== 'undefined' && error.response?.status === 401) {
+        localStorage.removeItem('nce_access_token');
+        window.location.href = '/';
+      }
+      return Promise.reject(error);
+    },
+  );
+
+  return client;
+};
+
+export const accountApiClient = createApiClient(SERVICE_BASE_URLS.ACCOUNT);
+export const cashflowApiClient = createApiClient(SERVICE_BASE_URLS.CASHFLOW);
+export const contentApiClient = createApiClient(SERVICE_BASE_URLS.CONTENT);
+
+export default accountApiClient;
