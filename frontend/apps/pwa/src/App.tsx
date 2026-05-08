@@ -1,3 +1,4 @@
+import React from 'react';
 import { useAuthStore } from '@nce/shared';
 import Login from './pages/Login';
 import Register from './pages/Register';

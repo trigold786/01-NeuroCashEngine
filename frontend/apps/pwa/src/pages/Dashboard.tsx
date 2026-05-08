@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuthStore } from '@nce/shared';
 
 export default function Dashboard() {
