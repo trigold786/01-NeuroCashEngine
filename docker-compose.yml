@@ -1,15 +1,16 @@
 version: '3.8'
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: nce-mysql
+  postgres:
+    image: postgres:18-alpine
+    container_name: nce-postgres
     ports:
-      - "3306:3306"
+      - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-nce_root_123}
-      MYSQL_DATABASE: nce_db
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-nce_root_123}
+      POSTGRES_DB: nce_db
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql
     networks:
       - nce-network
 
@@ -29,15 +30,15 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=root
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      - mysql
+      - postgres
       - redis
     networks:
       - nce-network
@@ -61,7 +62,7 @@ services:
     ports:
       - "3003:3003"
     depends_on:
-      - mysql
+      - postgres
     networks:
       - nce-network
 
@@ -81,13 +82,13 @@ services:
     ports:
       - "3005:3005"
     environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=root
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
     depends_on:
-      - mysql
+      - postgres
     networks:
       - nce-network
 
@@ -97,13 +98,13 @@ services:
     ports:
       - "3006:3006"
     environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=root
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
     depends_on:
-      - mysql
+      - postgres
     networks:
       - nce-network
 
@@ -113,18 +114,18 @@ services:
     ports:
       - "3007:3007"
     environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=root
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
     depends_on:
-      - mysql
+      - postgres
     networks:
       - nce-network
 
 volumes:
-  mysql-data:
+  postgres-data:
   redis-data:
   file-storage:
 

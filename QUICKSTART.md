@@ -19,14 +19,14 @@ cat .env
 ### 步骤2：构建并启动所有服务
 由于我们有多个微服务，推荐分步启动确保稳定性：
 
-#### 首先启动基础设施（MySQL、Redis）
+#### 首先启动基础设施（PostgreSQL、Redis）
 ```bash
 cd 01-NeuroCashEngine
-docker-compose up -d mysql redis
+docker-compose up -d postgres redis
 
-# 等待约30秒，让MySQL和Redis完全启动
+# 等待约30秒，让PostgreSQL和Redis完全启动
 # 可以查看日志确认
-docker-compose logs -f mysql
+docker-compose logs -f postgres
 ```
 
 #### 然后启动后端服务
@@ -95,11 +95,11 @@ npm run dev
 **解决方案：**
 修改 `docker-compose.yml` 中的端口映射。
 
-### 问题：MySQL连接失败
+### 问题：PostgreSQL连接失败
 **解决方案：**
-- 确认MySQL容器是否正常运行：`docker-compose ps`
+- 确认PostgreSQL容器是否正常运行：`docker-compose ps`
 - 检查.env中的DB_PASSWORD配置
-- 等待MySQL完全启动（通常需要1-2分钟）
+- 等待PostgreSQL完全启动（通常需要30-60秒）
 
 ### 问题：前端无法连接后端API
 **解决方案：**

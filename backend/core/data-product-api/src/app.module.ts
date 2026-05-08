@@ -9,14 +9,14 @@ import { DataProductController } from './controllers/DataProductController';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT) || 3306,
-      username: process.env.DB_USER || 'root',
+      port: parseInt(process.env.DB_PORT || '5432') || 5432,
+      username: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASSWORD || 'nce_root_123',
       database: process.env.DB_NAME || 'nce_db',
       entities: [InvestmentSentiment],
-      synchronize: true, // 生产环境建议关闭
+      synchronize: true,
       logging: process.env.NODE_ENV !== 'production',
     }),
     TypeOrmModule.forFeature([InvestmentSentiment]),

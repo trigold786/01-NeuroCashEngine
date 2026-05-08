@@ -6,23 +6,30 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts"
+    "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.19",
-    "@nestjs/config": "^3.3.0",
+    "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.1.19",
     "@nestjs/platform-express": "^11.1.19",
     "@nestjs/typeorm": "^11.0.1",
-    "class-validator": "^0.15.1",
     "class-transformer": "^0.5.1",
-    "mysql2": "^3.22.3",
+    "class-validator": "^0.15.1",
+    "pg": "^8.11.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "typeorm": "^0.3.28"
   },
   "devDependencies": {
+    "@nestjs/testing": "^11.1.19",
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.6.2",
+    "jest": "^30.4.1",
+    "ts-jest": "^29.4.9",
     "ts-node-dev": "^2.0.0",
     "typescript": "^6.0.3"
   }

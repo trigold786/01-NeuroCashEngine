@@ -1,7 +1,7 @@
 FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps --only=production
+RUN npm install --legacy-peer-deps --only=production
 COPY . .
 RUN npm run build
 EXPOSE 3005

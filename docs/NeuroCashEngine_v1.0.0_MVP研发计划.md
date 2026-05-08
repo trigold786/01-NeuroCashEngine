@@ -7,7 +7,7 @@
 **Architecture:** 采用微服务架构，核心服务独立部署，共享服务与NSI复用；前端采用共享业务逻辑层+多端适配层的架构，最大化代码复用。开发顺序遵循M1到M4的里程碑节点，每个里程碑交付可测试的完整功能。
 
 **Tech Stack:**
-- 后端：Node.js + TypeScript + NestJS + MySQL + Redis
+- 后端：Node.js + TypeScript + NestJS + PostgreSQL 18 + Redis
 - 前端：Vite + React + Zustand + Capacitor + TypeScript
 - 基础设施：Docker + Kubernetes + API Gateway + CI/CD
 - 测试：Jest + Cypress + Postman
