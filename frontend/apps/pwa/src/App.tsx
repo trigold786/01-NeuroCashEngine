@@ -6,13 +6,17 @@ import Dashboard from './pages/Dashboard';
 import AssetOverview from './pages/AssetOverview';
 import NewsList from './pages/NewsList';
 import NewsDetail from './pages/NewsDetail';
+import BusinessCashFlow from './pages/BusinessCashFlow';
+import BusinessSopList from './pages/BusinessSopList';
+import BusinessSopDetail from './pages/BusinessSopDetail';
 
-type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail';
+export type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail' | 'business-cashflow' | 'business-sops' | 'business-sop-detail';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [currentPage, setCurrentPage] = React.useState<Page>(isAuthenticated ? 'dashboard' : 'login');
   const [currentNewsId, setCurrentNewsId] = React.useState<string | null>(null);
+  const [currentSopId, setCurrentSopId] = React.useState<string | null>(null);
 
   if (!isAuthenticated && !['login', 'register'].includes(currentPage)) {
     setCurrentPage('login');
@@ -36,6 +40,16 @@ function App() {
           return null;
         }
         return <NewsDetail navigateTo={setCurrentPage} newsId={currentNewsId} />;
+      case 'business-cashflow':
+        return <BusinessCashFlow navigateTo={setCurrentPage} />;
+      case 'business-sops':
+        return <BusinessSopList navigateTo={setCurrentPage} setCurrentSopId={setCurrentSopId} />;
+      case 'business-sop-detail':
+        if (!currentSopId) {
+          setCurrentPage('business-sops');
+          return null;
+        }
+        return <BusinessSopDetail navigateTo={setCurrentPage} sopId={currentSopId} />;
       default:
         return <Dashboard navigateTo={setCurrentPage} />;
     }

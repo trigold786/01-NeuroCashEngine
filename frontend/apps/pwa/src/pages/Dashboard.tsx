@@ -1,11 +1,20 @@
-import { useAuthStore } from '@nce/shared';
+import { useEffect } from 'react';
+import { useAuthStore, useBusinessStore } from '@nce/shared';
+import { Page } from '../App';
 
 interface DashboardProps {
-  navigateTo: (page: string) => void;
+  navigateTo: (page: Page) => void;
 }
 
 export default function Dashboard({ navigateTo }: DashboardProps) {
   const { user, logout } = useAuthStore();
+  const { fetchIndustries } = useBusinessStore();
+
+  useEffect(() => {
+    fetchIndustries();
+  }, [fetchIndustries]);
+
+  const isBusinessUser = user?.accountType === 'ENTERPRISE' || user?.role === 'ENTERPRISE';
 
   return (
     <div style={{ padding: '20px' }}>
@@ -33,7 +42,7 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
       }}>
         <h2>欢迎，{user?.username}！</h2>
         <p>邮箱：{user?.email}</p>
-        <p>账号类型：{user?.accountType === 'ENTERPRISE' ? '企业用户' : '个人用户'}</p>
+        <p>账号类型：{isBusinessUser ? '企业用户' : '个人用户'}</p>
         {user?.companyName && <p>企业名称：{user.companyName}</p>}
         {user?.industryName && <p>所属行业：{user.industryName}</p>}
       </div>
@@ -55,6 +64,7 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
           <h3 style={{ color: '#0066cc', marginBottom: '8px' }}>📊 资产概览</h3>
           <p style={{ color: '#666' }}>查看和管理您的资产配置</p>
         </div>
+
         <div
           style={{
             background: 'white',
@@ -71,6 +81,44 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
           <h3 style={{ color: '#0066cc', marginBottom: '8px' }}>📰 资讯中心</h3>
           <p style={{ color: '#666' }}>查看最新的金融市场资讯</p>
         </div>
+
+        {isBusinessUser && (
+          <>
+            <div
+              style={{
+                background: 'white',
+                padding: '24px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                cursor: 'pointer',
+                transition: 'transform 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              onClick={() => navigateTo('business-cashflow')}
+            >
+              <h3 style={{ color: '#cc6600', marginBottom: '8px' }}>📈 现金流预测</h3>
+              <p style={{ color: '#666' }}>查看企业现金流预测和预警</p>
+            </div>
+
+            <div
+              style={{
+                background: 'white',
+                padding: '24px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                cursor: 'pointer',
+                transition: 'transform 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              onClick={() => navigateTo('business-sops')}
+            >
+              <h3 style={{ color: '#cc6600', marginBottom: '8px' }}>📋 SOP管理</h3>
+              <p style={{ color: '#666' }}>生成和管理资金调拨SOP文档</p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

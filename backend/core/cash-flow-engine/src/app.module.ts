@@ -3,10 +3,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UserAssetAccount } from './entities/UserAssetAccount.entity';
 import { CashFlowRecord } from './entities/CashFlowRecord.entity';
+import { CashFlowForecast } from './entities/CashFlowForecast.entity';
+import { SopTemplate } from './entities/SopTemplate.entity';
+import { GeneratedSop } from './entities/GeneratedSop.entity';
+import { IndustryClassification } from './entities/IndustryClassification.entity';
 import { AssetService } from './services/AssetService';
 import { CashFlowService } from './services/CashFlowService';
+import { BusinessCashFlowService } from './services/BusinessCashFlowService';
 import { AssetController } from './controllers/AssetController';
 import { CashFlowController } from './controllers/CashFlowController';
+import { BusinessCashFlowController } from './controllers/BusinessCashFlowController';
 
 @Module({
   imports: [
@@ -18,13 +24,13 @@ import { CashFlowController } from './controllers/CashFlowController';
       username: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || 'nce_root_123',
       database: process.env.DB_NAME || 'nce_db',
-      entities: [UserAssetAccount, CashFlowRecord],
-      synchronize: true, // 生产环境建议关闭
+      entities: [UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification],
+      synchronize: true,
       logging: process.env.NODE_ENV !== 'production',
     }),
-    TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord]),
+    TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification]),
   ],
-  providers: [AssetService, CashFlowService],
-  controllers: [AssetController, CashFlowController],
+  providers: [AssetService, CashFlowService, BusinessCashFlowService],
+  controllers: [AssetController, CashFlowController, BusinessCashFlowController],
 })
 export class AppModule {}

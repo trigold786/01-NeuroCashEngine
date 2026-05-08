@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { assetApi, CreateAssetAccountData } from '../api/asset';
-import { UserAssetAccount, AssetOverview, AssetAccountType } from '../types';
+import { UserAssetAccount, AssetOverview } from '../types';
 
 interface AssetState {
   overview: AssetOverview | null;
@@ -14,7 +14,7 @@ interface AssetState {
   clearError: () => void;
 }
 
-export const useAssetStore = create<AssetState>((set, get) => ({
+export const useAssetStore = create<AssetState>((set) => ({
   overview: null,
   accounts: [],
   loading: false,
@@ -43,7 +43,7 @@ export const useAssetStore = create<AssetState>((set, get) => ({
   createAccount: async (data) => {
     set({ loading: true, error: null });
     try {
-      const account = await assetApi.createAccount(data);
+      await assetApi.createAccount(data);
       // 重新获取概览
       const overview = await assetApi.getOverview();
       set({ overview, accounts: overview.accounts, loading: false });

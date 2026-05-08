@@ -1,8 +1,8 @@
 import { cashflowApiClient } from './client';
-import { UserAssetAccount, AssetOverview, AssetAccountType } from '../types';
+import { UserAssetAccount, AssetOverview } from '../types';
 
 export interface CreateAssetAccountData {
-  accountType: AssetAccountType;
+  accountType: string;
   institutionCode?: string;
   balance: number;
   currency?: string;

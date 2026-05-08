@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNewsStore, NewsCategory, NewsSourceType, News } from '@nce/shared';
+import { Page } from '../App';
 
 interface NewsListProps {
-  navigateTo: (page: string) => void;
+  navigateTo: (page: Page) => void;
   setCurrentNewsId: (id: string) => void;
 }
 

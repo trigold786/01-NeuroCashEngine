@@ -87,3 +87,45 @@ export interface News {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// B端相关类型
+export interface CashFlowForecast {
+  forecastId: string;
+  userId: string;
+  forecastDate: string;
+  predictedBalance: number;
+  isAlert: boolean;
+  alertMessage?: string;
+  generatedSopId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum SopType {
+  SHORTAGE = 'SHORTAGE',
+  SURPLUS = 'SURPLUS',
+}
+
+export interface GeneratedSop {
+  sopId: string;
+  userId: string;
+  templateId?: string;
+  title: string;
+  content: string;
+  exportFormat?: string;
+  fileUrl?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IndustryClassification {
+  id: number;
+  industryCode: number;
+  industryName: string;
+  description?: string;
+  industryFeatures?: any;
+  parentId?: number;
+  level: number;
+  createdAt: Date;
+  updatedAt: Date;
+}

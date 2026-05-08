@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useAssetStore, AssetAccountType } from '@nce/shared';
+import { useState, useEffect } from 'react';
+import { useAssetStore } from '@nce/shared';
 import { Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -7,11 +7,12 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { Page } from '../App';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface AssetOverviewProps {
-  navigateTo: (page: string) => void;
+  navigateTo: (page: Page) => void;
 }
 
 const CHART_COLORS = ['#00cc66', '#0066cc', '#cc6600', '#cc0000'];
@@ -29,16 +30,6 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
   useEffect(() => {
     fetchOverview();
   }, [fetchOverview]);
-
-  const getAssetTypeLabel = (type: string): string => {
-    const labels: Record<string, string> = {
-      'CASH': '现金',
-      'DEPOSIT': '存款',
-      'FUND': '基金',
-      'STOCK': '股票',
-    };
-    return labels[type] || type;
-  };
 
   const handleSubmitAdd = async (e: React.FormEvent) => {
     e.preventDefault();
