@@ -1,0 +1,85 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: nce-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-nce_root_123}
+      MYSQL_DATABASE: nce_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - nce-network
+
+  redis:
+    image: redis:7.0
+    container_name: nce-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - nce-network
+
+  account-center:
+    build: ./backend/shared/account-center
+    container_name: nce-account-center
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
+      - DB_NAME=nce_db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - nce-network
+
+  notification-service:
+    build: ./backend/shared/notification-service
+    container_name: nce-notification-service
+    ports:
+      - "3002:3002"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    networks:
+      - nce-network
+
+  config-service:
+    build: ./backend/shared/config-service
+    container_name: nce-config-service
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mysql
+    networks:
+      - nce-network
+
+  file-storage-service:
+    build: ./backend/shared/file-storage-service
+    container_name: nce-file-storage-service
+    ports:
+      - "3004:3004"
+    volumes:
+      - file-storage:/app/uploads
+    networks:
+      - nce-network
+
+volumes:
+  mysql-data:
+  redis-data:
+  file-storage:
+
+networks:
+  nce-network:
+    driver: bridge

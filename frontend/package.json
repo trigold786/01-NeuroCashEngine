@@ -1,0 +1,16 @@
+{
+  "name": "neurocashengine-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:pwa": "cd apps/pwa && npm run dev",
+    "build:pwa": "cd apps/pwa && npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}
