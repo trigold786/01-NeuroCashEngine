@@ -4,6 +4,7 @@ export * from './api/auth';
 export * from './api/asset';
 export * from './api/news';
 export * from './api/business';
+export * from './api/data-product';
 export * from './store/auth.store';
 export * from './store/asset.store';
 export * from './store/news.store';

@@ -129,3 +129,24 @@ export interface IndustryClassification {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// 数据产品API类型
+export enum AssetCategory {
+  CASH = 'CASH',
+  DEPOSIT = 'DEPOSIT',
+  FUND = 'FUND',
+  STOCK = 'STOCK',
+  BOND = 'BOND',
+}
+
+export interface InvestmentSentiment {
+  date: string;
+  assetCategory: AssetCategory;
+  sentimentScore: number;
+  totalSamples: number;
+}
+
+export interface DataProductResponse<T> {
+  success: boolean;
+  data: T;
+}
