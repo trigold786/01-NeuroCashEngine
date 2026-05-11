@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { businessApi, GenerateForecastParams, GenerateSopParams } from '../api/business';
-import { CashFlowForecast, GeneratedSop, IndustryClassification } from '../types';
+import { CashFlowForecast, GeneratedSop, IndustryClassification, CashFlowEvent, EventType } from '../types';
 
 interface BusinessState {
   forecasts: CashFlowForecast[];
   sops: GeneratedSop[];
   industries: IndustryClassification[];
   currentSop: GeneratedSop | null;
+  events: CashFlowEvent[];
   loading: boolean;
   error: string | null;
   fetchForecasts: () => Promise<void>;
@@ -16,6 +17,9 @@ interface BusinessState {
   fetchSopById: (id: string) => Promise<void>;
   deleteSop: (id: string) => Promise<void>;
   fetchIndustries: () => Promise<void>;
+  fetchEvents: () => Promise<void>;
+  createEvent: (params: { eventType: EventType; eventDate: string; amount: number; description?: string }) => Promise<void>;
+  seedEvents: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -24,6 +28,7 @@ export const useBusinessStore = create<BusinessState>((set) => ({
   sops: [],
   industries: [],
   currentSop: null,
+  events: [],
   loading: false,
   error: null,
 
@@ -94,6 +99,37 @@ export const useBusinessStore = create<BusinessState>((set) => ({
       set({ industries, loading: false });
     } catch (error: any) {
       set({ error: error.response?.data?.message || 'Failed to fetch industries', loading: false });
+    }
+  },
+
+  fetchEvents: async () => {
+    set({ loading: true, error: null });
+    try {
+      const events = await businessApi.getEvents();
+      set({ events, loading: false });
+    } catch (error: any) {
+      set({ error: error.response?.data?.message || 'Failed to fetch events', loading: false });
+    }
+  },
+
+  createEvent: async (params) => {
+    set({ loading: true, error: null });
+    try {
+      const event = await businessApi.createEvent(params);
+      set((state) => ({ events: [...state.events, event], loading: false }));
+    } catch (error: any) {
+      set({ error: error.response?.data?.message || 'Failed to create event', loading: false });
+    }
+  },
+
+  seedEvents: async () => {
+    set({ loading: true, error: null });
+    try {
+      await businessApi.seedEvents();
+      const events = await businessApi.getEvents();
+      set({ events, loading: false });
+    } catch (error: any) {
+      set({ error: error.response?.data?.message || 'Failed to seed events', loading: false });
     }
   },
 

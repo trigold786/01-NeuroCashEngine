@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
-import { useBusinessStore, SopType } from '@nce/shared';
+import { useBusinessStore, SopType, EventType } from '@nce/shared';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import annotationPlugin from 'chartjs-plugin-annotation';
 import { Page } from '../App';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, annotationPlugin);
 
 interface BusinessCashFlowProps {
   navigateTo: (page: Page) => void;
@@ -13,16 +14,36 @@ interface BusinessCashFlowProps {
 export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) {
   const {
     forecasts,
+    events,
     loading,
     error,
     fetchForecasts,
+    fetchEvents,
+    seedEvents,
     generateForecast,
     generateSop,
   } = useBusinessStore();
 
   useEffect(() => {
     fetchForecasts();
-  }, [fetchForecasts]);
+    fetchEvents();
+  }, [fetchForecasts, fetchEvents]);
+
+  const eventTypeLabels: Record<EventType, string> = {
+    [EventType.TAX_DUE]: '税费缴纳',
+    [EventType.PAYDAY]: '发薪日',
+    [EventType.CONTRACT_PAYMENT]: '合同付款',
+    [EventType.LOAN_DUE]: '贷款到期',
+    [EventType.RECEIVABLE_DUE]: '应收账款',
+  };
+
+  const eventTypeColors: Record<EventType, string> = {
+    [EventType.TAX_DUE]: '#ff6b6b',
+    [EventType.PAYDAY]: '#4ecdc4',
+    [EventType.CONTRACT_PAYMENT]: '#45b7d1',
+    [EventType.LOAN_DUE]: '#f7b731',
+    [EventType.RECEIVABLE_DUE]: '#a55ee4',
+  };
 
   const chartData = {
     labels: forecasts.map(f => f.forecastDate),
@@ -38,7 +59,7 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
     ],
   };
 
-  const chartOptions = {
+  const chartOptions: any = {
     responsive: true,
     plugins: {
       legend: {
@@ -46,6 +67,32 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
       },
     },
   };
+
+  if (events.length > 0 && forecasts.length > 0) {
+    const annotations: any = {};
+    events.forEach((event, index) => {
+      const forecastIndex = forecasts.findIndex(f => f.forecastDate === event.eventDate);
+      if (forecastIndex !== -1) {
+        annotations[`event-${index}`] = {
+          type: 'point',
+          xValue: forecastIndex,
+          yValue: Number(forecasts[forecastIndex].predictedBalance),
+          backgroundColor: eventTypeColors[event.eventType],
+          borderColor: eventTypeColors[event.eventType],
+          borderWidth: 2,
+          radius: 8,
+          label: {
+            display: true,
+            content: eventTypeLabels[event.eventType],
+            position: 'bottom',
+            color: eventTypeColors[event.eventType],
+            font: { size: 10 },
+          },
+        };
+      }
+    });
+    chartOptions.plugins.annotation = { annotations };
+  }
 
   const alerts = forecasts.filter(f => f.isAlert);
 
@@ -78,6 +125,22 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
         </div>
 
         <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            onClick={() => seedEvents()}
+            disabled={loading}
+            style={{
+              padding: '10px 24px',
+              backgroundColor: '#45b7d1',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              opacity: loading ? 0.7 : 1
+            }}
+          >
+            加载示例事件
+          </button>
           <button
             onClick={() => generateForecast({ forecastDays: 90 })}
             disabled={loading}

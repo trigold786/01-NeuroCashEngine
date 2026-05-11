@@ -7,9 +7,11 @@ import { GeneratedSop } from '../entities/GeneratedSop.entity';
 import { IndustryClassification } from '../entities/IndustryClassification.entity';
 import { UserAssetAccount } from '../entities/UserAssetAccount.entity';
 import { CashFlowRecord } from '../entities/CashFlowRecord.entity';
+import { CashFlowEvent, EventType } from '../entities/CashFlowEvent.entity';
 import { decryptBalance } from '../utils/crypto.util';
 import { GenerateForecastDto } from '../dto/GenerateForecast.dto';
 import { GenerateSopDto } from '../dto/GenerateSop.dto';
+import { CreateCashFlowEventDto } from '../dto/CreateCashFlowEvent.dto';
 
 @Injectable()
 export class BusinessCashFlowService {
@@ -26,6 +28,8 @@ export class BusinessCashFlowService {
     private readonly accountRepository: Repository<UserAssetAccount>,
     @InjectRepository(CashFlowRecord)
     private readonly recordRepository: Repository<CashFlowRecord>,
+    @InjectRepository(CashFlowEvent)
+    private readonly eventRepository: Repository<CashFlowEvent>,
   ) {}
 
   async initializeIndustryData(): Promise<void> {
@@ -191,5 +195,41 @@ export class BusinessCashFlowService {
     return await this.industryRepository.find({
       order: { industryCode: 'ASC' },
     });
+  }
+
+  async getEvents(userId: string): Promise<CashFlowEvent[]> {
+    return await this.eventRepository.find({
+      where: { userId },
+      order: { eventDate: 'ASC' },
+    });
+  }
+
+  async createEvent(userId: string, dto: CreateCashFlowEventDto): Promise<CashFlowEvent> {
+    const event = this.eventRepository.create({
+      userId,
+      eventType: dto.eventType,
+      eventDate: new Date(dto.eventDate),
+      amount: dto.amount,
+      description: dto.description,
+    });
+    return await this.eventRepository.save(event);
+  }
+
+  async seedSampleEvents(userId: string): Promise<void> {
+    const existingCount = await this.eventRepository.count({ where: { userId } });
+    if (existingCount > 0) return;
+
+    const today = new Date();
+    const sampleEvents: CreateCashFlowEventDto[] = [
+      { eventType: EventType.TAX_DUE, eventDate: new Date(today.getTime() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], amount: 15000, description: '季度税款申报' },
+      { eventType: EventType.PAYDAY, eventDate: new Date(today.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], amount: 50000, description: '员工工资发放' },
+      { eventType: EventType.CONTRACT_PAYMENT, eventDate: new Date(today.getTime() + 25 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], amount: 80000, description: '供应商合同款' },
+      { eventType: EventType.LOAN_DUE, eventDate: new Date(today.getTime() + 40 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], amount: 100000, description: '银行贷款到期' },
+      { eventType: EventType.RECEIVABLE_DUE, eventDate: new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], amount: 60000, description: '客户应收账款' },
+    ];
+
+    for (const dto of sampleEvents) {
+      await this.createEvent(userId, dto);
+    }
   }
 }

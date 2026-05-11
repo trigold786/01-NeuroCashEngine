@@ -1,5 +1,5 @@
 import { cashflowApiClient } from './client';
-import { CashFlowForecast, GeneratedSop, IndustryClassification, SopType } from '../types';
+import { CashFlowForecast, GeneratedSop, IndustryClassification, SopType, CashFlowEvent, EventType } from '../types';
 
 export interface GenerateForecastParams {
   forecastDays?: number;
@@ -39,5 +39,17 @@ export const businessApi = {
 
   async getIndustries(): Promise<IndustryClassification[]> {
     return await cashflowApiClient.get('/business/cashflow/industries');
+  },
+
+  async getEvents(): Promise<CashFlowEvent[]> {
+    return await cashflowApiClient.get('/business/cashflow/events');
+  },
+
+  async createEvent(params: { eventType: EventType; eventDate: string; amount: number; description?: string }): Promise<CashFlowEvent> {
+    return await cashflowApiClient.post('/business/cashflow/events', params);
+  },
+
+  async seedEvents(): Promise<void> {
+    return await cashflowApiClient.post('/business/cashflow/events/seed');
   },
 };

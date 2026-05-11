@@ -2,6 +2,7 @@ import { Controller, Get, Post, Delete, Param, Body, Req } from '@nestjs/common'
 import { BusinessCashFlowService } from '../services/BusinessCashFlowService';
 import { GenerateForecastDto } from '../dto/GenerateForecast.dto';
 import { GenerateSopDto } from '../dto/GenerateSop.dto';
+import { CreateCashFlowEventDto } from '../dto/CreateCashFlowEvent.dto';
 
 @Controller('business/cashflow')
 export class BusinessCashFlowController {
@@ -47,5 +48,24 @@ export class BusinessCashFlowController {
   @Get('industries')
   async getIndustries() {
     return await this.service.getIndustries();
+  }
+
+  @Get('events')
+  async getEvents(@Req() req: any) {
+    const userId = req.user?.id || 'demo-user-1';
+    return await this.service.getEvents(userId);
+  }
+
+  @Post('events')
+  async createEvent(@Body() dto: CreateCashFlowEventDto, @Req() req: any) {
+    const userId = req.user?.id || 'demo-user-1';
+    return await this.service.createEvent(userId, dto);
+  }
+
+  @Post('events/seed')
+  async seedEvents(@Req() req: any) {
+    const userId = req.user?.id || 'demo-user-1';
+    await this.service.seedSampleEvents(userId);
+    return { success: true };
   }
 }

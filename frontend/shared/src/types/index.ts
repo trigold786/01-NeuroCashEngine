@@ -144,6 +144,25 @@ export interface IndustryClassification {
   updatedAt: Date;
 }
 
+export enum EventType {
+  TAX_DUE = 'TAX_DUE',
+  PAYDAY = 'PAYDAY',
+  CONTRACT_PAYMENT = 'CONTRACT_PAYMENT',
+  LOAN_DUE = 'LOAN_DUE',
+  RECEIVABLE_DUE = 'RECEIVABLE_DUE',
+}
+
+export interface CashFlowEvent {
+  id: string;
+  userId: string;
+  eventType: EventType;
+  eventDate: string;
+  amount: number;
+  description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // 数据产品API类型
 export enum AssetCategory {
   CASH = 'CASH',
