@@ -9,14 +9,21 @@ import NewsDetail from './pages/NewsDetail';
 import BusinessCashFlow from './pages/BusinessCashFlow';
 import BusinessSopList from './pages/BusinessSopList';
 import BusinessSopDetail from './pages/BusinessSopDetail';
+import Strategy from './pages/Strategy';
 
-export type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail' | 'business-cashflow' | 'business-sops' | 'business-sop-detail';
+export type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail' | 'business-cashflow' | 'business-sops' | 'business-sop-detail' | 'strategy';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [currentPage, setCurrentPage] = React.useState<Page>(isAuthenticated ? 'dashboard' : 'login');
   const [currentNewsId, setCurrentNewsId] = React.useState<string | null>(null);
   const [currentSopId, setCurrentSopId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isAuthenticated && (currentPage === 'login' || currentPage === 'register')) {
+      setCurrentPage('dashboard');
+    }
+  }, [isAuthenticated, currentPage]);
 
   if (!isAuthenticated && !['login', 'register'].includes(currentPage)) {
     setCurrentPage('login');
@@ -50,6 +57,8 @@ function App() {
           return null;
         }
         return <BusinessSopDetail navigateTo={setCurrentPage} sopId={currentSopId} />;
+      case 'strategy':
+        return <Strategy navigateTo={setCurrentPage} />;
       default:
         return <Dashboard navigateTo={setCurrentPage} />;
     }

@@ -157,6 +157,23 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
           }}
           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          onClick={() => navigateTo('strategy')}
+        >
+          <h3 style={{ color: '#0066cc', marginBottom: '8px' }}>💹 投资策略</h3>
+          <p style={{ color: '#666' }}>风险评估与资产配置推荐</p>
+        </div>
+
+        <div
+          style={{
+            background: 'white',
+            padding: '24px',
+            borderRadius: '8px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            cursor: 'pointer',
+            transition: 'transform 0.2s',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           onClick={() => navigateTo('news')}
         >
           <h3 style={{ color: '#0066cc', marginBottom: '8px' }}>📰 资讯中心</h3>
