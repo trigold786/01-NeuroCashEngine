@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { InvestmentSentiment } from './entities/InvestmentSentiment.entity';
 import { DataProductService } from './services/DataProductService';
 import { DataProductController } from './controllers/DataProductController';
+import { SentimentService } from './services/SentimentService';
+import { SentimentController } from './controllers/SentimentController';
 
 @Module({
   imports: [
@@ -12,7 +14,7 @@ import { DataProductController } from './controllers/DataProductController';
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432') || 5432,
-      username: process.env.DB_USER || 'postgres',
+      username: process.env.DB_USER || 'nce_root',
       password: process.env.DB_PASSWORD || 'nce_root_123',
       database: process.env.DB_NAME || 'nce_db',
       entities: [InvestmentSentiment],
@@ -21,7 +23,7 @@ import { DataProductController } from './controllers/DataProductController';
     }),
     TypeOrmModule.forFeature([InvestmentSentiment]),
   ],
-  providers: [DataProductService],
-  controllers: [DataProductController],
+  providers: [DataProductService, SentimentService],
+  controllers: [DataProductController, SentimentController],
 })
 export class AppModule {}
