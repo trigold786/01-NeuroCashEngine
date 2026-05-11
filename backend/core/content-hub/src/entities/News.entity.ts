@@ -46,10 +46,13 @@ export class News {
   @Column({ length: 512, nullable: true })
   sourceUrl: string;
 
+  @Column({ length: 128, nullable: true })
+  author: string;
+
   @Column({ length: 512, nullable: true })
   imageUrl: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   publishTime: Date;
 
   @Column({ type: 'int', default: 0 })

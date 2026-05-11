@@ -93,6 +93,7 @@ export interface News {
   sourceType: NewsSourceType;
   sourceName: string;
   sourceUrl?: string;
+  author?: string;
   imageUrl?: string;
   publishTime?: Date;
   viewCount: number;

@@ -22,6 +22,9 @@ export class NewsService {
         category: NewsCategory.MACRO,
         sourceType: NewsSourceType.OFFICIAL,
         sourceName: '中国人民银行',
+        sourceUrl: 'http://www.pbc.gov.cn/2026/05/10/news.html',
+        author: '中国人民银行',
+        publishTime: new Date('2026-05-10T09:00:00'),
         isVerified: true,
       },
       {
@@ -31,6 +34,9 @@ export class NewsService {
         category: NewsCategory.STOCK,
         sourceType: NewsSourceType.VERIFIED,
         sourceName: '财新',
+        sourceUrl: 'https://finance.caixin.com/2026-05-09/stock-market.html',
+        author: '李明',
+        publishTime: new Date('2026-05-09T15:30:00'),
         isVerified: true,
       },
       {
@@ -40,6 +46,9 @@ export class NewsService {
         category: NewsCategory.STOCK,
         sourceType: NewsSourceType.OFFICIAL,
         sourceName: '上海证券交易所',
+        sourceUrl: 'http://www.sse.com.cn/2026/05/08/ksb做市商.html',
+        author: '上交所',
+        publishTime: new Date('2026-05-08T10:00:00'),
         isVerified: true,
       },
       {
@@ -49,6 +58,9 @@ export class NewsService {
         category: NewsCategory.FUND,
         sourceType: NewsSourceType.VERIFIED,
         sourceName: '雪球',
+        sourceUrl: 'https://xueqiu.com/2026/05/08/money-fund.html',
+        author: '王强',
+        publishTime: new Date('2026-05-08T14:20:00'),
         isVerified: true,
       },
       {
@@ -58,6 +70,9 @@ export class NewsService {
         category: NewsCategory.BOND,
         sourceType: NewsSourceType.VERIFIED,
         sourceName: '华尔街见闻',
+        sourceUrl: 'https://wallstreetcn.com/2026/05/07/bond-yield.html',
+        author: '陈静',
+        publishTime: new Date('2026-05-07T16:45:00'),
         isVerified: true,
       },
       {
@@ -67,6 +82,9 @@ export class NewsService {
         category: NewsCategory.MACRO,
         sourceType: NewsSourceType.OFFICIAL,
         sourceName: '中国政府网',
+        sourceUrl: 'http://www.gov.cn/2026/05/06/policy意见.html',
+        author: '国务院',
+        publishTime: new Date('2026-05-06T08:00:00'),
         isVerified: true,
       },
     ];

@@ -180,7 +180,7 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
             )}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', color: '#999', fontSize: '12px' }}>
-              <span>{news.sourceName}</span>
+              <span>{[news.sourceName, news.author, news.publishTime ? new Date(news.publishTime).toLocaleDateString('zh-CN') : null].filter(Boolean).join(' · ')}</span>
               <span>{news.viewCount} 阅读</span>
             </div>
           </div>

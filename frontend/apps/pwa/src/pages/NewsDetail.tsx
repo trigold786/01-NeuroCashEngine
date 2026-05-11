@@ -97,9 +97,12 @@ export default function NewsDetail({ navigateTo, newsId }: NewsDetailProps) {
             fontSize: '14px',
             marginBottom: '24px',
             paddingBottom: '16px',
-            borderBottom: '1px solid #eee'
+            borderBottom: '1px solid #eee',
+            flexWrap: 'wrap',
+            gap: '8px'
           }}>
-            <span>来源：{currentNews.sourceName}</span>
+            <span>来源：{currentNews.sourceName}{currentNews.author ? ` | 作者：${currentNews.author}` : ''}{currentNews.publishTime ? ` | 发布时间：${new Date(currentNews.publishTime).toLocaleString('zh-CN')}` : ''}</span>
+            {currentNews.sourceUrl && <a href={currentNews.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0066cc' }}>查看原文 →</a>}
             <span>阅读：{currentNews.viewCount}</span>
           </div>
 
