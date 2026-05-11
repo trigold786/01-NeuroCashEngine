@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserAssetAccount, AccountType } from '../entities/UserAssetAccount.entity';
@@ -8,6 +8,7 @@ import { encryptBalance, decryptBalance } from '../utils/crypto.util';
 
 @Injectable()
 export class AssetService {
+  private readonly logger = new Logger(AssetService.name);
   constructor(
     @InjectRepository(UserAssetAccount)
     private readonly accountRepository: Repository<UserAssetAccount>,
@@ -35,38 +36,102 @@ export class AssetService {
       [AccountType.FUND]: '基金',
       [AccountType.STOCK]: '股票',
     };
+    
+    let balance = 0;
+    if (encryptedBalance && encryptedBalance.includes(':')) {
+      try {
+        balance = decryptBalance(encryptedBalance);
+      } catch (err) {
+        balance = 0;
+      }
+    } else if (encryptedBalance) {
+      balance = parseFloat(encryptedBalance) || 0;
+    }
+    
     return {
       id: accountId,
       ...rest,
-      balance: decryptBalance(encryptedBalance),
+      balance,
       accountTypeName: accountTypeNames[account.accountType as number] || '其他',
+      termYears: account.termYears,
+      interestRate: account.interestRate,
+      startDate: account.startDate,
+      endDate: account.endDate,
+      fundCode: account.fundCode,
+      fundName: account.fundName,
+      buyPrice: account.buyPrice,
+      buyDate: account.buyDate,
+      shareCount: account.shareCount,
+      nav: account.nav,
+      stockCode: account.stockCode,
+      stockName: account.stockName,
+      currentPrice: account.currentPrice,
     };
   }
 
   async createAccount(userId: string, dto: CreateAssetAccountDto): Promise<any> {
+    this.logger.log(`Creating account for user ${userId} with dto: ${JSON.stringify(dto)}`);
     const accountType = this.convertAccountType(dto.accountType as string);
-    
-    const account = this.accountRepository.create({
-      userId,
-      authStatus: 2, // 手动录入
-      ...dto,
-      accountType,
-      encryptedBalance: encryptBalance(dto.balance),
-    });
-    
-    const saved = await this.accountRepository.save(account);
-    return this.formatAccount(saved);
+
+    const balanceStr = dto.balance.toString();
+
+    const account = new UserAssetAccount();
+    account.userId = userId;
+    account.accountType = accountType;
+    account.accountName = dto.accountName || '默认账户';
+    account.encryptedBalance = balanceStr;
+    account.currency = dto.currency || 'CNY';
+    account.authStatus = 2;
+    account.institutionCode = dto.institutionCode;
+
+    if (accountType === AccountType.DEPOSIT) {
+      account.termYears = dto.termYears;
+      account.interestRate = dto.interestRate;
+      account.startDate = dto.startDate ? new Date(dto.startDate) : undefined;
+      account.endDate = dto.endDate ? new Date(dto.endDate) : undefined;
+    }
+
+    if (accountType === AccountType.FUND) {
+      account.fundCode = dto.fundCode;
+      account.fundName = dto.fundName;
+      account.buyPrice = dto.buyPrice;
+      account.buyDate = dto.buyDate ? new Date(dto.buyDate) : undefined;
+      account.shareCount = dto.shareCount;
+      account.nav = dto.nav;
+    }
+
+    if (accountType === AccountType.STOCK) {
+      account.stockCode = dto.stockCode;
+      account.stockName = dto.stockName;
+      account.buyPrice = dto.buyPrice;
+      account.buyDate = dto.buyDate ? new Date(dto.buyDate) : undefined;
+      account.shareCount = dto.shareCount;
+      account.currentPrice = dto.currentPrice;
+    }
+
+    this.logger.log(`Account entity before save: ${JSON.stringify(account)}`);
+    try {
+      const saved = await this.accountRepository.save(account);
+      this.logger.log(`Saved account: ${JSON.stringify(saved)}`);
+      return this.formatAccount(saved);
+    } catch (err: any) {
+      this.logger.error(`Failed to save account: ${err.message}`, err.stack);
+      throw err;
+    }
   }
 
   async getAccounts(userId: string): Promise<any[]> {
+    this.logger.log(`getAccounts called for userId: ${userId}`);
     const accounts = await this.accountRepository.find({
       where: { userId },
       order: { createdAt: 'DESC' },
     });
+    this.logger.log(`Found ${accounts.length} accounts`);
     return accounts.map(acc => this.formatAccount(acc));
   }
 
   async getAssetOverview(userId: string): Promise<any> {
+    this.logger.log(`getAssetOverview called for userId: ${userId}`);
     const accounts = await this.getAccounts(userId);
 
     // 统计各类型资产

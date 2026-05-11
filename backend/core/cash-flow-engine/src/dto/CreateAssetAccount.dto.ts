@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsNumber, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsDateString, IsInt, IsPositive } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateAssetAccountDto {
   @IsString()
@@ -9,6 +10,7 @@ export class CreateAssetAccountDto {
   institutionCode?: string;
 
   @IsNumber()
+  @IsPositive()
   balance: number;
 
   @IsOptional()
@@ -22,4 +24,62 @@ export class CreateAssetAccountDto {
   @IsOptional()
   @IsDateString()
   lastSyncTime?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  termYears?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  interestRate?: number;
+
+  @IsOptional()
+  @IsDateString()
+  startDate?: string;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
+
+  @IsOptional()
+  @IsString()
+  fundCode?: string;
+
+  @IsOptional()
+  @IsString()
+  fundName?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  buyPrice?: number;
+
+  @IsOptional()
+  @IsDateString()
+  buyDate?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  shareCount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  nav?: number;
+
+  @IsOptional()
+  @IsString()
+  stockCode?: string;
+
+  @IsOptional()
+  @IsString()
+  stockName?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  currentPrice?: number;
 }

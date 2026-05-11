@@ -1,12 +1,12 @@
 export enum UserRole {
-  CUSTOMER = 'CUSTOMER',
-  ENTERPRISE = 'ENTERPRISE',
-  ADMIN = 'ADMIN',
+  CUSTOMER = 'customer',
+  ENTERPRISE = 'enterprise',
+  ADMIN = 'admin',
 }
 
 export enum AccountType {
-  INDIVIDUAL = 'INDIVIDUAL',
-  ENTERPRISE = 'ENTERPRISE',
+  INDIVIDUAL = 'individual',
+  ENTERPRISE = 'enterprise',
 }
 
 export interface User {
@@ -47,6 +47,19 @@ export interface UserAssetAccount {
   accountTypeName?: string;
   createdAt: Date;
   updatedAt: Date;
+  termYears?: number;
+  interestRate?: number;
+  startDate?: Date;
+  endDate?: Date;
+  fundCode?: string;
+  fundName?: string;
+  buyPrice?: number;
+  buyDate?: Date;
+  shareCount?: number;
+  nav?: number;
+  stockCode?: string;
+  stockName?: string;
+  currentPrice?: number;
 }
 
 export interface AssetOverview {

@@ -25,6 +25,20 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
     accountName: '',
     balance: 0,
     currency: 'CNY',
+    institutionCode: '',
+    termYears: undefined as number | undefined,
+    interestRate: undefined as number | undefined,
+    startDate: '',
+    endDate: '',
+    fundCode: '',
+    fundName: '',
+    buyPrice: undefined as number | undefined,
+    buyDate: '',
+    shareCount: undefined as number | undefined,
+    nav: undefined as number | undefined,
+    stockCode: '',
+    stockName: '',
+    currentPrice: undefined as number | undefined,
   });
 
   useEffect(() => {
@@ -40,6 +54,20 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
       accountName: '',
       balance: 0,
       currency: 'CNY',
+      institutionCode: '',
+      termYears: undefined,
+      interestRate: undefined,
+      startDate: '',
+      endDate: '',
+      fundCode: '',
+      fundName: '',
+      buyPrice: undefined,
+      buyDate: '',
+      shareCount: undefined,
+      nav: undefined,
+      stockCode: '',
+      stockName: '',
+      currentPrice: undefined,
     });
   };
 
@@ -209,6 +237,21 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
                       {acc.accountName || acc.accountTypeName}
                     </p>
                     <p style={{ margin: 0, color: '#666' }}>{acc.accountTypeName}</p>
+                    {acc.accountType === 'DEPOSIT' && acc.termYears && (
+                      <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#999' }}>
+                        {acc.termYears}年 | {acc.interestRate}% | {acc.startDate?.split('T')[0]} ~ {acc.endDate?.split('T')[0]}
+                      </p>
+                    )}
+                    {acc.accountType === 'FUND' && acc.fundCode && (
+                      <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#999' }}>
+                        {acc.fundCode} | {acc.fundName} | 持有{acc.shareCount}份 | 净值{acc.nav}
+                      </p>
+                    )}
+                    {acc.accountType === 'STOCK' && acc.stockCode && (
+                      <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#999' }}>
+                        {acc.stockCode} {acc.stockName} | 持仓{acc.shareCount}股 | 现价{acc.currentPrice}
+                      </p>
+                    )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#00cc66', margin: 0 }}>
@@ -289,6 +332,17 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label>机构代码 (选填)</label>
+                <input
+                  type="text"
+                  value={newAccount.institutionCode}
+                  onChange={(e) => setNewAccount({ ...newAccount, institutionCode: e.target.value })}
+                  placeholder="例如：ICBC"
+                  style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <label>余额</label>
                 <input
                   type="number"
@@ -299,6 +353,176 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
                   style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
                 />
               </div>
+
+              {newAccount.accountType === 'DEPOSIT' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>存款年限</label>
+                    <input
+                      type="number"
+                      value={newAccount.termYears || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, termYears: parseInt(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>利率 (%)</label>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={newAccount.interestRate || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, interestRate: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>存款起始日</label>
+                    <input
+                      type="date"
+                      value={newAccount.startDate}
+                      onChange={(e) => setNewAccount({ ...newAccount, startDate: e.target.value })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>存款到期日</label>
+                    <input
+                      type="date"
+                      value={newAccount.endDate}
+                      onChange={(e) => setNewAccount({ ...newAccount, endDate: e.target.value })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {newAccount.accountType === 'FUND' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>基金代码</label>
+                    <input
+                      type="text"
+                      value={newAccount.fundCode}
+                      onChange={(e) => setNewAccount({ ...newAccount, fundCode: e.target.value })}
+                      placeholder="例如：110022"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>基金名称</label>
+                    <input
+                      type="text"
+                      value={newAccount.fundName}
+                      onChange={(e) => setNewAccount({ ...newAccount, fundName: e.target.value })}
+                      placeholder="例如：易方达消费行业股票"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>买入价</label>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={newAccount.buyPrice || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, buyPrice: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>买入日期</label>
+                    <input
+                      type="date"
+                      value={newAccount.buyDate}
+                      onChange={(e) => setNewAccount({ ...newAccount, buyDate: e.target.value })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>持有份额</label>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={newAccount.shareCount || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, shareCount: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>基金净值</label>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={newAccount.nav || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, nav: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {newAccount.accountType === 'STOCK' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>股票代码</label>
+                    <input
+                      type="text"
+                      value={newAccount.stockCode}
+                      onChange={(e) => setNewAccount({ ...newAccount, stockCode: e.target.value })}
+                      placeholder="例如：600519"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>股票名称</label>
+                    <input
+                      type="text"
+                      value={newAccount.stockName}
+                      onChange={(e) => setNewAccount({ ...newAccount, stockName: e.target.value })}
+                      placeholder="例如：贵州茅台"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>买入价</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newAccount.buyPrice || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, buyPrice: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>买入日期</label>
+                    <input
+                      type="date"
+                      value={newAccount.buyDate}
+                      onChange={(e) => setNewAccount({ ...newAccount, buyDate: e.target.value })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>持仓数量</label>
+                    <input
+                      type="number"
+                      step="1"
+                      value={newAccount.shareCount || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, shareCount: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>当前股价</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newAccount.currentPrice || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, currentPrice: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                </>
+              )}
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
                 <button

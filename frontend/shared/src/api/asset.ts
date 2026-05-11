@@ -7,6 +7,19 @@ export interface CreateAssetAccountData {
   balance: number;
   currency?: string;
   accountName?: string;
+  termYears?: number;
+  interestRate?: number;
+  startDate?: string;
+  endDate?: string;
+  fundCode?: string;
+  fundName?: string;
+  buyPrice?: number;
+  buyDate?: string;
+  shareCount?: number;
+  nav?: number;
+  stockCode?: string;
+  stockName?: string;
+  currentPrice?: number;
 }
 
 export const assetApi = {
