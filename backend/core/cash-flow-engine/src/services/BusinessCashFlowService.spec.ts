@@ -105,18 +105,30 @@ describe('BusinessCashFlowService', () => {
   });
 
   describe('generateSop', () => {
-    it('should generate SOP successfully', async () => {
-      mockTemplateRepository.findOne.mockResolvedValue({
+    it('should generate SOP with filled forecast data', async () => {
+      const mockTemplate = {
         templateId: 'tmpl-1',
         type: 'SHORTAGE',
-        content: 'SOP content',
-      });
-      mockGeneratedSopRepository.create.mockReturnValue({});
-      mockGeneratedSopRepository.save.mockResolvedValue({ sopId: 'sop-1' });
+        content: '# SOP\nPredicted: {{predictedBalance}}\nDate: {{forecastDate}}\nAlert: {{alertDate}}',
+      };
+      const mockForecasts = [
+        { forecastDate: '2024-01-15', predictedBalance: 45000, isAlert: true },
+        { forecastDate: '2024-01-20', predictedBalance: 35000, isAlert: false },
+      ];
+
+      mockTemplateRepository.findOne.mockResolvedValue(mockTemplate);
+      mockForecastRepository.find.mockResolvedValue(mockForecasts);
+      mockGeneratedSopRepository.create.mockImplementation(data => data);
+      mockGeneratedSopRepository.save.mockImplementation(data => Promise.resolve({ sopId: 'sop-1', ...data }));
 
       const result = await service.generateSop('user-1', { type: SopType.SHORTAGE });
 
-      expect(result).toBeDefined();
+      expect(mockForecastRepository.find).toHaveBeenCalledWith({
+        where: { userId: 'user-1' },
+        order: { forecastDate: 'ASC' },
+      });
+      expect(result.content).toContain('45000.00');
+      expect(result.content).toContain('2024-01-15');
     });
 
     it('should throw NotFoundException when template not found', async () => {

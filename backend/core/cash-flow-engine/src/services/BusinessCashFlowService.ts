@@ -160,12 +160,32 @@ export class BusinessCashFlowService {
       throw new NotFoundException('SOP template not found');
     }
 
+    const forecasts = await this.forecastRepository.find({
+      where: { userId },
+      order: { forecastDate: 'ASC' },
+    });
+
+    const alertForecast = forecasts.find(f => f.isAlert) || forecasts[0];
+    const latestForecast = forecasts[forecasts.length - 1];
+
+    let filledContent = template.content;
+    if (alertForecast) {
+      filledContent = filledContent.replace(/\{\{predictedBalance\}\}/g, alertForecast.predictedBalance.toFixed(2));
+      filledContent = filledContent.replace(/\{\{forecastDate\}\}/g, alertForecast.forecastDate);
+      const alertDate = new Date(alertForecast.forecastDate);
+      alertDate.setDate(alertDate.getDate() - 3);
+      filledContent = filledContent.replace(/\{\{alertDate\}\}/g, alertDate.toISOString().split('T')[0]);
+    }
+    if (latestForecast) {
+      filledContent = filledContent.replace(/\{\{latestBalance\}\}/g, latestForecast.predictedBalance.toFixed(2));
+    }
+
     const title = dto.title || `${type === SopType.SHORTAGE ? '资金短缺' : '资金盈余'}应对方案`;
     const generatedSop = this.generatedSopRepository.create({
       userId,
       templateId: template.templateId,
       title,
-      content: template.content,
+      content: filledContent,
     });
 
     return await this.generatedSopRepository.save(generatedSop);

@@ -11,6 +11,7 @@ import { CashFlowEvent } from './entities/CashFlowEvent.entity';
 import { AssetService } from './services/AssetService';
 import { CashFlowService } from './services/CashFlowService';
 import { BusinessCashFlowService } from './services/BusinessCashFlowService';
+import { SopExportService } from './services/SopExportService';
 import { AssetController } from './controllers/AssetController';
 import { CashFlowController } from './controllers/CashFlowController';
 import { BusinessCashFlowController } from './controllers/BusinessCashFlowController';
@@ -34,7 +35,7 @@ import { BusinessCashFlowController } from './controllers/BusinessCashFlowContro
     }),
     TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent]),
   ],
-  providers: [AssetService, CashFlowService, BusinessCashFlowService],
+  providers: [AssetService, CashFlowService, BusinessCashFlowService, SopExportService],
   controllers: [AssetController, CashFlowController, BusinessCashFlowController],
 })
 export class AppModule {}

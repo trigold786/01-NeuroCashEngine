@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useBusinessStore } from '@nce/shared';
 import { Page } from '../App';
+import { businessApi } from '@nce/shared';
 
 interface BusinessSopDetailProps {
   navigateTo: (page: Page) => void;
@@ -93,8 +94,18 @@ export default function BusinessSopDetail({ navigateTo, sopId }: BusinessSopDeta
                 cursor: 'pointer',
                 marginRight: '12px'
               }}
-              onClick={() => {
-                alert('导出功能开发中');
+              onClick={async () => {
+                try {
+                  const blob = await businessApi.exportPdf(sopId);
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `sop-${sopId}.html`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                } catch (e) {
+                  alert('导出失败');
+                }
               }}
             >
               导出PDF
@@ -108,11 +119,17 @@ export default function BusinessSopDetail({ navigateTo, sopId }: BusinessSopDeta
                 borderRadius: '4px',
                 cursor: 'pointer'
               }}
-              onClick={() => {
-                alert('发送功能开发中');
+              onClick={async () => {
+                try {
+                  const markdown = await businessApi.exportMarkdown(sopId);
+                  await navigator.clipboard.writeText(markdown);
+                  alert('已复制到剪贴板');
+                } catch (e) {
+                  alert('复制失败');
+                }
               }}
             >
-              发送到邮箱
+              复制内容
             </button>
           </div>
         </div>

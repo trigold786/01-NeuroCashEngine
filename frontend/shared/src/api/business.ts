@@ -52,4 +52,18 @@ export const businessApi = {
   async seedEvents(): Promise<void> {
     return await cashflowApiClient.post('/business/cashflow/events/seed');
   },
+
+  async exportPdf(sopId: string): Promise<Blob> {
+    const url = `${(import.meta as any).env?.VITE_CASHFLOW_API_URL || 'http://localhost:3005'}/business/cashflow/sop/${sopId}/export/pdf`;
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('nce_access_token') || ''}`,
+      },
+    });
+    return response.blob();
+  },
+
+  async exportMarkdown(sopId: string): Promise<string> {
+    return await cashflowApiClient.get(`/business/cashflow/sop/${sopId}/export/markdown`);
+  },
 };
