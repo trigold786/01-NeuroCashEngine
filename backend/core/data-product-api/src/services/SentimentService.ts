@@ -36,7 +36,7 @@ export class SentimentService {
     if (missing.length > 0) {
       const fallbackData = await this.sentimentRepository.find({
         where: { assetCategory: In(missing) },
-        order: { date: 'DESC' },
+        order: { date: 'DESC', updatedAt: 'DESC' },
       });
       const seen = new Set<string>();
       for (const item of fallbackData) {

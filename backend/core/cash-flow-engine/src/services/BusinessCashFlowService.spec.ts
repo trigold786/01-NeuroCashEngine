@@ -114,7 +114,7 @@ describe('BusinessCashFlowService', () => {
       const mockTemplate = {
         templateId: 'tmpl-1',
         type: 'SHORTAGE',
-        content: '# SOP\nPredicted: {{predictedBalance}}\nDate: {{forecastDate}}\nAlert: {{alertDate}}',
+        content: '# SOP\nPredicted: {{predictedBalance}}\nDate: {{forecastDate}}\nAlert: {{alertDate}}\nLatest: {{latestBalance}}',
       };
       const mockForecasts = [
         { forecastDate: '2024-01-15', predictedBalance: 45000, isAlert: true },
@@ -134,6 +134,8 @@ describe('BusinessCashFlowService', () => {
       });
       expect(result.content).toContain('45000.00');
       expect(result.content).toContain('2024-01-15');
+      expect(result.content).toContain('2024-01-12');
+      expect(result.content).toContain('35000.00');
     });
 
     it('should throw NotFoundException when template not found', async () => {
