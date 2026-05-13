@@ -119,6 +119,20 @@ const PRODUCTS: Record<string, Product[]> = {
 export class StrategyService {
   private readonly logger = new Logger(StrategyService.name);
 
+  calculateRiskScore(answers: Record<string, string>): { score: number; riskProfile: string } {
+    const scoreMap: Record<string, number> = { A: 1, B: 2, C: 3 };
+    let score = 0;
+    for (const key of Object.keys(answers)) {
+      const answer = answers[key];
+      if (scoreMap[answer] !== undefined) {
+        score += scoreMap[answer];
+      }
+    }
+    const riskProfile = this.calculateRiskProfile(score);
+    this.logger.log(`Calculated score: ${score}, riskProfile: ${riskProfile}`);
+    return { score, riskProfile };
+  }
+
   calculateRiskProfile(score: number): string {
     if (score >= 5 && score <= 8) {
       return 'conservative';

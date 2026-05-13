@@ -10,24 +10,13 @@ import {
   Legend,
 } from 'chart.js';
 import { Page } from '../App';
+import { strategyApi, Product, Recommendation } from '@nce/shared/src/api/strategy';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface StrategyProps {
   navigateTo: (page: Page) => void;
 }
-
-interface Product {
-  id: string;
-  name: string;
-  type: string;
-  expectedReturn: number;
-  riskLevel: number;
-  description: string;
-}
-
-interface Recommendation {
-  riskProfile: string;
   allocation: { CASH: number; DEPOSIT: number; FUND: number; STOCK: number };
   riskLevel: number;
 }
@@ -106,35 +95,14 @@ export default function Strategy({ navigateTo }: StrategyProps) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/strategy/risk-score', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(answers),
-      });
-      if (!response.ok) throw new Error('Failed to calculate risk profile');
-      const data = await response.json();
-
-      const recommendResponse = await fetch('/api/strategy/recommend', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ riskProfile: data.riskProfile }),
-      });
-      if (!recommendResponse.ok) throw new Error('Failed to get recommendation');
-      const recommendData = await recommendResponse.json();
+      const riskResult = await strategyApi.calculateRiskScore(answers);
+      const recommendData = await strategyApi.getRecommendation(riskResult.riskProfile);
       setRecommendation(recommendData);
-
-      const productsResponse = await fetch(`/api/strategy/products?riskLevel=${data.riskProfile}`);
-      if (!productsResponse.ok) throw new Error('Failed to get products');
-      const productsData = await productsResponse.json();
+      const productsData = await strategyApi.getProductsByRiskLevel(riskResult.riskProfile);
       setProducts(productsData);
-
       setCurrentStep(2);
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      setError(err?.response?.data?.message || err.message || 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -293,11 +261,11 @@ export default function Strategy({ navigateTo }: StrategyProps) {
           boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
         }}>
           <h3 style={{ marginTop: 0, marginBottom: '16px' }}>资产配置建议</h3>
-          {recommendation && (
+          {(() => { const cd = getChartData(); return cd && (
             <div style={{ maxHeight: '300px' }}>
-              <Bar data={getChartData()!} options={chartOptions} />
+              <Bar data={cd} options={chartOptions} />
             </div>
-          )}
+          ); })()}
         </div>
 
         <div style={{

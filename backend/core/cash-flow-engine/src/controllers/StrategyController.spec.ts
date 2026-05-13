@@ -10,6 +10,7 @@ describe('StrategyController', () => {
     generateRecommendation: jest.fn(),
     getProductsByRiskLevel: jest.fn(),
     calculateRiskProfile: jest.fn(),
+    calculateRiskScore: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -93,8 +94,8 @@ describe('StrategyController', () => {
   });
 
   describe('calculateRiskScore', () => {
-    it('should return risk profile based on questionnaire answers', async () => {
-      mockStrategyService.calculateRiskProfile.mockReturnValue('moderate');
+    it('should delegate to service for risk score calculation', async () => {
+      mockStrategyService.calculateRiskScore.mockResolvedValue({ riskProfile: 'moderate', score: 10 });
 
       const answers = {
         q1: 'B',
@@ -106,11 +107,12 @@ describe('StrategyController', () => {
 
       const result = await controller.calculateRiskScore(answers);
 
+      expect(mockStrategyService.calculateRiskScore).toHaveBeenCalledWith(answers);
       expect(result).toEqual({ riskProfile: 'moderate', score: 10 });
     });
 
     it('should return conservative for edge case score', async () => {
-      mockStrategyService.calculateRiskProfile.mockReturnValue('conservative');
+      mockStrategyService.calculateRiskScore.mockResolvedValue({ riskProfile: 'conservative', score: 5 });
 
       const answers = {
         q1: 'A',
@@ -122,6 +124,7 @@ describe('StrategyController', () => {
 
       const result = await controller.calculateRiskScore(answers);
 
+      expect(mockStrategyService.calculateRiskScore).toHaveBeenCalledWith(answers);
       expect(result).toEqual({ riskProfile: 'conservative', score: 5 });
     });
   });

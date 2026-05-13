@@ -43,6 +43,31 @@ describe('StrategyService', () => {
     });
   });
 
+  describe('calculateRiskScore', () => {
+    it('should calculate score from A/B/C answers and return profile', () => {
+      const result = service.calculateRiskScore({ q1: 'A', q2: 'B', q3: 'C', q4: 'A', q5: 'B' });
+      expect(result.score).toBe(1 + 2 + 3 + 1 + 2);
+      expect(result.riskProfile).toBe('moderate');
+    });
+
+    it('should return score 5 for all A answers (conservative)', () => {
+      const result = service.calculateRiskScore({ q1: 'A', q2: 'A', q3: 'A', q4: 'A', q5: 'A' });
+      expect(result.score).toBe(5);
+      expect(result.riskProfile).toBe('conservative');
+    });
+
+    it('should return score 15 for all C answers (aggressive)', () => {
+      const result = service.calculateRiskScore({ q1: 'C', q2: 'C', q3: 'C', q4: 'C', q5: 'C' });
+      expect(result.score).toBe(15);
+      expect(result.riskProfile).toBe('aggressive');
+    });
+
+    it('should skip unknown answer values', () => {
+      const result = service.calculateRiskScore({ q1: 'A', q2: 'D', q3: 'C' });
+      expect(result.score).toBe(1 + 3);
+    });
+  });
+
   describe('generateRecommendation', () => {
     it('should return conservative allocation for conservative risk profile', () => {
       const result = service.generateRecommendation('conservative');
