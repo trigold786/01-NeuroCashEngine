@@ -67,7 +67,7 @@ describe('BusinessCashFlowService', () => {
 
   describe('initializeSopTemplates', () => {
     it('should not re-initialize if templates exist', async () => {
-      mockTemplateRepository.count.mockResolvedValue(2);
+      mockTemplateRepository.count.mockResolvedValue(4);
       await service.initializeSopTemplates();
       expect(mockTemplateRepository.create).not.toHaveBeenCalled();
     });
@@ -77,7 +77,7 @@ describe('BusinessCashFlowService', () => {
       mockTemplateRepository.create.mockReturnValue({});
       mockTemplateRepository.save.mockResolvedValue({});
       await service.initializeSopTemplates();
-      expect(mockTemplateRepository.create).toHaveBeenCalledTimes(2);
+      expect(mockTemplateRepository.create).toHaveBeenCalledTimes(4);
     });
   });
 

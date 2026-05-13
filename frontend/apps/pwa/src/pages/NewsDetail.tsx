@@ -63,7 +63,7 @@ export default function NewsDetail({ navigateTo, newsId }: NewsDetailProps) {
           maxWidth: '800px',
           margin: '0 auto'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
             <span
               style={{
                 padding: '2px 8px',
@@ -74,6 +74,15 @@ export default function NewsDetail({ navigateTo, newsId }: NewsDetailProps) {
               }}
             >
               {getSourceTypeLabel(currentNews.sourceType)}
+            </span>
+            <span style={{
+              padding: '2px 8px',
+              fontSize: '12px',
+              borderRadius: '12px',
+              backgroundColor: '#fff7e6',
+              color: '#cc6600',
+            }}>
+              {currentNews.sourceType === NewsSourceType.OFFICIAL ? '来源: 官方渠道' : '来源: 已验证渠道'}
             </span>
             <span
               style={{

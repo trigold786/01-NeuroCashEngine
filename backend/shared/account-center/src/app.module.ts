@@ -15,7 +15,7 @@ import { User } from './user/user.entity';
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432') || 5432,
-      username: process.env.DB_USER || 'postgres',
+      username: process.env.DB_USER || 'nce_root',
       password: process.env.DB_PASSWORD || 'nce_root_123',
       database: process.env.DB_NAME || 'nce_db',
       entities: [User],

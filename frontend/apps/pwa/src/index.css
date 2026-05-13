@@ -16,3 +16,7 @@ body {
 #root {
   min-height: 100vh;
 }
+
+.data-font {
+  font-family: 'Courier New', monospace;
+}

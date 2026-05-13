@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useAssetStore } from '@nce/shared';
-import { Doughnut } from 'react-chartjs-2';
+import { Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   ArcElement,
   Tooltip,
   Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
 } from 'chart.js';
 import { Page } from '../App';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 interface AssetOverviewProps {
   navigateTo: (page: Page) => void;
@@ -20,6 +23,8 @@ const CHART_COLORS = ['#00cc66', '#0066cc', '#cc6600', '#cc0000'];
 export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
   const { overview, accounts, loading, error, fetchOverview, createAccount, deleteAccount } = useAssetStore();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [chartMode, setChartMode] = useState<'doughnut' | 'bar'>('doughnut');
+  const [selectedTypeIndex, setSelectedTypeIndex] = useState<number | null>(null);
   const [newAccount, setNewAccount] = useState({
     accountType: 'CASH',
     accountName: '',
@@ -78,27 +83,53 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
   };
 
   const chartData = overview?.chartData || [];
+  const colorsWithHighlight = CHART_COLORS.map((c, i) =>
+    selectedTypeIndex !== null && i !== selectedTypeIndex ? c + '80' : c
+  );
+
   const data = {
     labels: chartData.map(d => d.name),
     datasets: [
       {
         label: '资产分布',
         data: chartData.map(d => d.value),
-        backgroundColor: CHART_COLORS,
+        backgroundColor: chartMode === 'doughnut' ? colorsWithHighlight : CHART_COLORS,
         borderColor: '#fff',
         borderWidth: 2,
       },
     ],
   };
 
-  const options = {
+  const doughnutOptions = {
     responsive: true,
+    onClick: (_event: any, elements: any[]) => {
+      if (elements.length > 0) {
+        setSelectedTypeIndex((prev) => (prev === elements[0].index ? null : elements[0].index));
+      } else {
+        setSelectedTypeIndex(null);
+      }
+    },
     plugins: {
       legend: {
         position: 'bottom' as const,
       },
     },
   };
+
+  const barOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+    },
+    scales: {
+      y: { beginAtZero: true },
+    },
+  };
+
+  const displayAccounts =
+    selectedTypeIndex !== null && overview
+      ? accounts.filter((acc: any) => acc.accountTypeName === overview.chartData[selectedTypeIndex]?.name)
+      : accounts;
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -127,20 +158,37 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
           </button>
           <h1 style={{ margin: 0 }}>资产概览</h1>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          style={{
-            padding: '10px 24px',
-            backgroundColor: '#0066cc',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '16px'
-          }}
-        >
-          + 添加账户
-        </button>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <button
+            onClick={fetchOverview}
+            disabled={loading}
+            style={{
+              padding: '10px 24px',
+              backgroundColor: 'white',
+              color: '#0066cc',
+              border: '1px solid #0066cc',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            刷新
+          </button>
+          <button
+            onClick={() => setShowAddModal(true)}
+            style={{
+              padding: '10px 24px',
+              backgroundColor: '#0066cc',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            + 添加账户
+          </button>
+        </div>
       </div>
 
       {loading && <p style={{ textAlign: 'center', color: '#666' }}>加载中...</p>}

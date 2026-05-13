@@ -109,6 +109,56 @@ export class BusinessCashFlowService {
       },
     ];
 
+    const loanDueTemplate = {
+      type: SopType.LOAN_DUE,
+      title: '贷款到期应对SOP',
+      content: `
+# 贷款到期应对SOP
+
+## 1. 确认贷款信息
+- 确认贷款金额和到期日
+- 检查当前账户余额
+- **贷款金额**: ¥{{predictedBalance}} (到期日: {{forecastDate}})
+- **预警日期**: {{alertDate}}
+
+## 2. 还款准备选项
+- 选项A：使用现有资金还款
+- 选项B：申请贷款展期
+- 选项C：通过其他融资渠道还款
+
+## 3. 执行与跟踪
+- 确定还款方案后立即执行
+- 确认还款到账并保留凭证
+- **最新余额**: ¥{{latestBalance}}
+      `,
+    };
+
+    const receivableDueTemplate = {
+      type: SopType.RECEIVABLE_DUE,
+      title: '应收款项催收SOP',
+      content: `
+# 应收款项催收SOP
+
+## 1. 核实应收信息
+- 确认应收金额和账期
+- 检查客户信用状况
+- **应收金额**: ¥{{predictedBalance}} (到期日: {{forecastDate}})
+- **预警日期**: {{alertDate}}
+
+## 2. 催收措施
+- 选项A：发送正式催收函
+- 选项B：电话沟通协商
+- 选项C：启动法律催收程序
+
+## 3. 执行与跟踪
+- 实施催收方案并持续跟进
+- 记录催收过程和结果
+- **最新余额**: ¥{{latestBalance}}
+      `,
+    };
+
+    templates.push(loanDueTemplate, receivableDueTemplate);
+
     for (const template of templates) {
       const entity = this.templateRepository.create(template);
       await this.templateRepository.save(entity);

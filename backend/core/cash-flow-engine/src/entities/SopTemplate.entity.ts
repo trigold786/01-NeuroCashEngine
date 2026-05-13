@@ -3,6 +3,8 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 export enum SopType {
   SHORTAGE = 'SHORTAGE',
   SURPLUS = 'SURPLUS',
+  LOAN_DUE = 'LOAN_DUE',
+  RECEIVABLE_DUE = 'RECEIVABLE_DUE',
 }
 
 @Entity('nce_sop_template')

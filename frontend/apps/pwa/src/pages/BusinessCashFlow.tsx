@@ -164,15 +164,26 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
 
       {/* 预警横幅 */}
       {alerts.length > 0 && (
-        <div style={{
-          background: '#fff0f0',
-          border: '1px solid #ffcccc',
-          borderRadius: '8px',
-          padding: '16px',
-          marginBottom: '24px'
-        }}>
-          <h3 style={{ color: '#cc0000', marginTop: 0, marginBottom: '12px' }}>⚠️ 预警信息</h3>
-          <p>未来有 {alerts.length} 次可能的资金短缺</p>
+        (() => {
+          const nearestAlert = alerts.reduce((earliest, a) =>
+            new Date(a.forecastDate) < new Date(earliest.forecastDate) ? a : earliest
+          );
+          const today = new Date();
+          const alertDate = new Date(nearestAlert.forecastDate);
+          const daysDiff = Math.ceil((alertDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          return (
+          <div style={{
+            background: '#fff0f0',
+            border: '1px solid #ffcccc',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '24px'
+          }}>
+            <h3 style={{ color: '#cc0000', marginTop: 0, marginBottom: '12px' }}>⚠️ 预警信息</h3>
+            <p>未来有 {alerts.length} 次可能的资金短缺</p>
+            <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#cc0000', margin: '12px 0' }}>
+              ⏰ 预计 {daysDiff} 天后存在 ¥{Number(nearestAlert.predictedBalance).toLocaleString('zh-CN', { minimumFractionDigits: 2 })} 资金缺口
+            </p>
           <button
             onClick={() => generateSop({ type: SopType.SHORTAGE })}
             style={{
@@ -188,6 +199,8 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
             生成应对SOP
           </button>
         </div>
+          );
+        })()
       )}
 
       {/* 预测图表 */}

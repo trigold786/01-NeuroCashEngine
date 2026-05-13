@@ -19,5 +19,6 @@
     "noFallthroughCasesInSwitch": false,
     "ignoreDeprecations": "6.0"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "node_modules", "dist"]
 }

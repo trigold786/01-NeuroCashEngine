@@ -118,6 +118,8 @@ export interface CashFlowForecast {
 export enum SopType {
   SHORTAGE = 'SHORTAGE',
   SURPLUS = 'SURPLUS',
+  LOAN_DUE = 'LOAN_DUE',
+  RECEIVABLE_DUE = 'RECEIVABLE_DUE',
 }
 
 export interface GeneratedSop {

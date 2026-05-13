@@ -1,12 +1,12 @@
 version: '3.8'
 services:
   postgres:
-    image: postgres:18-alpine
+    image: postgres:16
     container_name: nce-postgres
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_USER: ${DB_USER:-nce_root}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-nce_root_123}
       POSTGRES_DB: nce_db
     volumes:
@@ -15,7 +15,7 @@ services:
       - nce-network
 
   redis:
-    image: redis:7.0
+    image: redis:7-alpine
     container_name: nce-redis
     ports:
       - "6379:6379"
@@ -32,47 +32,15 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_USER=${DB_USER:-postgres}
+      - DB_USER=${DB_USER:-nce_root}
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET:-nce_jwt_secret_key_123}
     depends_on:
       - postgres
       - redis
-    networks:
-      - nce-network
-
-  notification-service:
-    build: ./backend/shared/notification-service
-    container_name: nce-notification-service
-    ports:
-      - "3002:3002"
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      - redis
-    networks:
-      - nce-network
-
-  config-service:
-    build: ./backend/shared/config-service
-    container_name: nce-config-service
-    ports:
-      - "3003:3003"
-    depends_on:
-      - postgres
-    networks:
-      - nce-network
-
-  file-storage-service:
-    build: ./backend/shared/file-storage-service
-    container_name: nce-file-storage-service
-    ports:
-      - "3004:3004"
-    volumes:
-      - file-storage:/app/uploads
     networks:
       - nce-network
 
@@ -84,9 +52,10 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_USER=${DB_USER:-postgres}
+      - DB_USER=${DB_USER:-nce_root}
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
+      - JWT_SECRET=${JWT_SECRET:-nce_jwt_secret_key_123}
     depends_on:
       - postgres
     networks:
@@ -100,7 +69,7 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_USER=${DB_USER:-postgres}
+      - DB_USER=${DB_USER:-nce_root}
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
     depends_on:
@@ -116,7 +85,7 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_USER=${DB_USER:-postgres}
+      - DB_USER=${DB_USER:-nce_root}
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
     depends_on:
@@ -124,10 +93,25 @@ services:
     networks:
       - nce-network
 
+  frontend:
+    build: ./frontend/apps/pwa
+    container_name: nce-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_ACCOUNT_API_URL=http://account-center:3001
+      - VITE_CASHFLOW_API_URL=http://cash-flow-engine:3005
+      - VITE_CONTENT_API_URL=http://content-hub:3006
+    depends_on:
+      - account-center
+      - cash-flow-engine
+      - content-hub
+    networks:
+      - nce-network
+
 volumes:
   postgres-data:
   redis-data:
-  file-storage:
 
 networks:
   nce-network:

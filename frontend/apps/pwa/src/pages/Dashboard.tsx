@@ -97,17 +97,17 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
         <div style={{ display: 'flex', gap: '24px', flex: 1 }}>
           <div>
             <div style={{ fontSize: '12px', opacity: 0.9, marginBottom: '4px' }}>总资产</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{isMasked ? '***' : formatCurrency(totalAssets)}</div>
+            <div className="data-font" style={{ fontSize: '24px', fontWeight: 'bold' }}>{isMasked ? '***' : formatCurrency(totalAssets)}</div>
           </div>
           <div style={{ borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '24px' }}>
             <div style={{ fontSize: '12px', opacity: 0.9, marginBottom: '4px' }}>昨日收益</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: getReturnColor(yesterdayReturn) }}>
+            <div className="data-font" style={{ fontSize: '24px', fontWeight: 'bold', color: getReturnColor(yesterdayReturn) }}>
               {formatReturn(yesterdayReturn, isMasked)}
             </div>
           </div>
           <div style={{ borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '24px' }}>
             <div style={{ fontSize: '12px', opacity: 0.9, marginBottom: '4px' }}>累计收益</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: getReturnColor(cumulativeReturn) }}>
+            <div className="data-font" style={{ fontSize: '24px', fontWeight: 'bold', color: getReturnColor(cumulativeReturn) }}>
               {formatReturn(cumulativeReturn, isMasked)}
             </div>
           </div>

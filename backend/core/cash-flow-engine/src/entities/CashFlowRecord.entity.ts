@@ -9,7 +9,7 @@ export class CashFlowRecord {
   @Column({ type: 'uuid' })
   accountId: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   tradeTime: Date;
 
   @Column({ type: 'decimal', precision: 18, scale: 4 })

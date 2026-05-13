@@ -2,7 +2,7 @@
 import * as crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-cbc';
-const KEY = Buffer.from(process.env.ENCRYPTION_KEY || 'nce_encryption_key_256_bit_1234', 'utf-8');
+const KEY = Buffer.from((process.env.ENCRYPTION_KEY || 'nce_encryption_key_256_bit_1234').padEnd(32, '0').slice(0, 32), 'utf-8');
 const IV_LENGTH = 16;
 
 export function encrypt(text: string): string {

@@ -1,10 +1,13 @@
-import { useState } from 'react';
-import { Bar } from 'react-chartjs-2';
+import { useState, useMemo } from 'react';
+import { Bar, Radar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  RadialLinearScale,
+  PointElement,
+  RadarElement,
   Title,
   Tooltip,
   Legend,
@@ -12,7 +15,7 @@ import {
 import { Page } from '../App';
 import { strategyApi, Product, Recommendation } from '@nce/shared/src/api/strategy';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, RadialLinearScale, PointElement, RadarElement, Title, Tooltip, Legend);
 
 interface StrategyProps {
   navigateTo: (page: Page) => void;
@@ -82,6 +85,8 @@ export default function Strategy({ navigateTo }: StrategyProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expectedReturn, setExpectedReturn] = useState(10);
+  const [maxDrawdown, setMaxDrawdown] = useState(15);
 
   const handleAnswerChange = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -124,6 +129,61 @@ export default function Strategy({ navigateTo }: StrategyProps) {
       ],
     };
   };
+
+  const getRadarData = () => {
+    const score = (val: string) => val === 'A' ? 25 : val === 'B' ? 50 : 75;
+    const reverse = (val: string) => val === 'A' ? 75 : val === 'B' ? 50 : 25;
+    const q1 = answers['q1'], q2 = answers['q2'], q3 = answers['q3'], q4 = answers['q4'], q5 = answers['q5'];
+    return {
+      labels: ['风险偏好', '流动性需求', '投资经验', '风险承受', '收益预期'],
+      datasets: [
+        {
+          label: '风险画像',
+          data: [
+            Math.round((reverse(q1) + score(q5)) / 2),
+            Math.round((reverse(q4) + score(q1)) / 2),
+            score(q2),
+            score(q3),
+            Math.round((score(q4) + score(q5)) / 2),
+          ],
+          backgroundColor: 'rgba(0, 102, 204, 0.2)',
+          borderColor: '#0066cc',
+          borderWidth: 2,
+          pointBackgroundColor: '#0066cc',
+        },
+      ],
+    };
+  };
+
+  const radarOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          stepSize: 20,
+        },
+      },
+    },
+    plugins: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: '投资者风险画像',
+        font: { size: 16 },
+      },
+    },
+  };
+
+  const deviation = useMemo(() => {
+    const baseReturn = 10;
+    const baseDrawdown = 15;
+    const returnDiff = Math.abs(expectedReturn - baseReturn) / baseReturn;
+    const drawdownDiff = Math.abs(maxDrawdown - baseDrawdown) / baseDrawdown;
+    return Math.round((returnDiff + drawdownDiff) / 2 * 100);
+  }, [expectedReturn, maxDrawdown]);
 
   const chartOptions = {
     responsive: true,
@@ -297,6 +357,70 @@ export default function Strategy({ navigateTo }: StrategyProps) {
             </div>
           )}
         </div>
+      </div>
+
+      <div style={{
+        background: 'white',
+        padding: '24px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        marginBottom: '24px',
+      }}>
+        {getRadarData() && (
+          <div style={{ maxHeight: '300px', maxWidth: '300px', margin: '0 auto' }}>
+            <Radar data={getRadarData()} options={radarOptions} />
+          </div>
+        )}
+      </div>
+
+      <div style={{
+        background: 'white',
+        padding: '24px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        marginBottom: '24px',
+      }}>
+        <h3 style={{ marginTop: 0, marginBottom: '16px' }}>参数调整</h3>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span>预期收益: {expectedReturn}%</span>
+          </label>
+          <input
+            type="range"
+            min="5"
+            max="20"
+            step="1"
+            value={expectedReturn}
+            onChange={(e) => setExpectedReturn(Number(e.target.value))}
+            style={{ width: '100%' }}
+          />
+        </div>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span>最大回撤: {maxDrawdown}%</span>
+          </label>
+          <input
+            type="range"
+            min="5"
+            max="30"
+            step="1"
+            value={maxDrawdown}
+            onChange={(e) => setMaxDrawdown(Number(e.target.value))}
+            style={{ width: '100%' }}
+          />
+        </div>
+        {deviation > 0 && (
+          <div style={{
+            padding: '12px',
+            backgroundColor: '#fff7e6',
+            border: '1px solid #ffd591',
+            borderRadius: '4px',
+            color: '#d46b08',
+            fontSize: '14px',
+          }}>
+            ⚠ 当前配置已偏离推荐组合{deviation}%
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
