@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuthStore, useBusinessStore, AccountType, UserRole, useNewsStore, NewsCategory } from '@nce/shared';
 import { useAssetStore } from '@nce/shared';
 import { Page } from '../App';
@@ -20,10 +20,38 @@ function formatReturn(value: number, isMasked: boolean): string {
 
 export default function Dashboard({ navigateTo, setCurrentNewsId }: DashboardProps) {
   const { user, logout } = useAuthStore();
-  const { fetchIndustries } = useBusinessStore();
+  const { fetchIndustries, generateForecast } = useBusinessStore();
   const { accounts, fetchOverview } = useAssetStore();
   const { newsList, fetchNewsList } = useNewsStore();
   const [isMasked, setIsMasked] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleManualRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await generateForecast({ forecastDays: 90 });
+      setLastRefresh(new Date());
+    } catch { /* ignore */ }
+    setIsRefreshing(false);
+  }, [generateForecast]);
+
+  useEffect(() => {
+    if (autoRefresh) {
+      handleManualRefresh();
+      refreshTimerRef.current = setInterval(handleManualRefresh, 300000);
+    } else {
+      if (refreshTimerRef.current) {
+        clearInterval(refreshTimerRef.current);
+        refreshTimerRef.current = null;
+      }
+    }
+    return () => {
+      if (refreshTimerRef.current) clearInterval(refreshTimerRef.current);
+    };
+  }, [autoRefresh, handleManualRefresh]);
 
   useEffect(() => {
     fetchIndustries();
@@ -197,10 +225,44 @@ export default function Dashboard({ navigateTo, setCurrentNewsId }: DashboardPro
           }}
           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          onClick={() => navigateTo('subscription')}
+        >
+          <h3 style={{ color: 'var(--brand-gold)', marginBottom: '8px' }}>👑 订阅中心</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>管理套餐、升级与功能权限</p>
+        </div>
+
+        <div
+          style={{
+            background: 'var(--bg-card)',
+            padding: '24px',
+            borderRadius: '8px',
+            boxShadow: 'var(--shadow-card)',
+            cursor: 'pointer',
+            transition: 'transform 0.2s',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           onClick={() => navigateTo('points')}
         >
           <h3 style={{ color: '#667eea', marginBottom: '8px' }}>🎯 积分中心</h3>
           <p style={{ color: 'var(--text-secondary)' }}>积分查询、推荐码管理与兑换</p>
+        </div>
+
+        <div
+          style={{
+            background: 'var(--bg-card)',
+            padding: '24px',
+            borderRadius: '8px',
+            boxShadow: 'var(--shadow-card)',
+            cursor: 'pointer',
+            transition: 'transform 0.2s',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          onClick={() => navigateTo('api-playground')}
+        >
+          <h3 style={{ color: '#00cc66', marginBottom: '8px' }}>🔌 开放平台</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>API文档、开发者工具与在线测试</p>
         </div>
 
         {isBusinessUser && (
@@ -350,6 +412,116 @@ export default function Dashboard({ navigateTo, setCurrentNewsId }: DashboardPro
             ))
           )}
         </div>
+      </div>
+
+      {/* 自动刷新设置 */}
+      <div style={{
+        background: 'var(--bg-card)',
+        borderRadius: '8px',
+        boxShadow: 'var(--shadow-card)',
+        marginTop: '24px',
+        overflow: 'hidden'
+      }}>
+        <div style={{
+          padding: '16px 20px',
+          borderBottom: '1px solid var(--border-color)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <h3 style={{ margin: 0 }}>⏱️ 数据刷新设置</h3>
+        </div>
+        <div style={{ padding: '16px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div>
+              <span style={{ fontWeight: '500' }}>自动刷新 (每5分钟)</span>
+              <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--text-tertiary)' }}>
+                {lastRefresh ? `上次刷新: ${lastRefresh.toLocaleTimeString('zh-CN')}` : '尚未刷新'}
+              </p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button
+                onClick={handleManualRefresh}
+                disabled={isRefreshing}
+                style={{
+                  padding: '6px 16px',
+                  borderRadius: '4px',
+                  border: '1px solid #0066cc',
+                  background: 'var(--bg-card)',
+                  color: 'var(--brand-blue)',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  opacity: isRefreshing ? 0.7 : 1,
+                }}
+              >
+                {isRefreshing ? '刷新中...' : '立即刷新'}
+              </button>
+              <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px' }}>
+                <input
+                  type="checkbox"
+                  checked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e.target.checked)}
+                  style={{ opacity: 0, width: 0, height: 0 }}
+                />
+                <span
+                  onClick={() => setAutoRefresh(!autoRefresh)}
+                  style={{
+                    position: 'absolute',
+                    cursor: 'pointer',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    borderRadius: '24px',
+                    backgroundColor: autoRefresh ? '#0066cc' : '#ccc',
+                    transition: '0.3s',
+                  }}
+                >
+                  <span style={{
+                    position: 'absolute',
+                    content: '""',
+                    height: '18px',
+                    width: '18px',
+                    left: autoRefresh ? '24px' : '3px',
+                    bottom: '3px',
+                    backgroundColor: 'white',
+                    borderRadius: '50%',
+                    transition: '0.3s',
+                  }} />
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 页脚 - 合规链接 */}
+      <div style={{
+        marginTop: '32px',
+        padding: '16px 0',
+        textAlign: 'center',
+        borderTop: '1px solid var(--border-color)',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '8px' }}>
+          <button
+            onClick={() => navigateTo('privacy')}
+            style={{ border: 'none', background: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '12px', textDecoration: 'underline' }}
+          >
+            隐私政策
+          </button>
+          <button
+            onClick={() => navigateTo('terms')}
+            style={{ border: 'none', background: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '12px', textDecoration: 'underline' }}
+          >
+            服务条款
+          </button>
+          <button
+            onClick={() => navigateTo('api-playground')}
+            style={{ border: 'none', background: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '12px', textDecoration: 'underline' }}
+          >
+            开放平台
+          </button>
+        </div>
+        <p style={{ margin: 0, color: 'var(--text-tertiary)', fontSize: '11px' }}>
+          © 2026 NeuroCashEngine. All rights reserved.
+        </p>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { BusinessCashFlowService } from './services/BusinessCashFlowService';
+import { SchedulerService } from './services/SchedulerService';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,6 +17,9 @@ async function bootstrap() {
   const businessService = app.get(BusinessCashFlowService);
   await businessService.initializeIndustryData();
   await businessService.initializeSopTemplates();
+
+  const schedulerService = app.get(SchedulerService);
+  schedulerService.startDataRefresh('demo-user-1', 60);
   
   await app.listen(3005);
   console.log('Cash Flow Engine is running on port 3005');

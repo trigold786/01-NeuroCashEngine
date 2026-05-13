@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Delete, Param, Body, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Req, Res, UseGuards } from '@nestjs/common';
 import { BusinessCashFlowService } from '../services/BusinessCashFlowService';
 import { SopExportService } from '../services/SopExportService';
 import { GenerateForecastDto } from '../dto/GenerateForecast.dto';
 import { GenerateSopDto } from '../dto/GenerateSop.dto';
 import { CreateCashFlowEventDto } from '../dto/CreateCashFlowEvent.dto';
+import { PermissionGuard } from '../guards/PermissionGuard.guard';
+import { Roles } from '../guards/roles.decorator';
 
 @Controller('business/cashflow')
 export class BusinessCashFlowController {
@@ -67,6 +69,8 @@ export class BusinessCashFlowController {
   }
 
   @Post('events/seed')
+  @UseGuards(PermissionGuard)
+  @Roles('admin')
   async seedEvents(@Req() req: any) {
     const userId = req.user?.id || 'demo-user-1';
     await this.service.seedSampleEvents(userId);

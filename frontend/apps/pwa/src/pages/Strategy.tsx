@@ -14,6 +14,7 @@ import {
 } from 'chart.js';
 import { Page } from '../App';
 import { strategyApi, Product, Recommendation, InvestmentStrategy, FundamentalAnalysis, TechnicalAnalysis } from '@nce/shared/src/api/strategy';
+import { CardSkeleton, StepSkeleton } from '../components/LoadingSkeleton';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, RadialLinearScale, PointElement, RadarElement, Title, Tooltip, Legend);
 
@@ -1066,10 +1067,13 @@ export default function Strategy({ navigateTo }: StrategyProps) {
         ))}
       </div>
 
-      {currentStep === 1 && renderStep1()}
-      {currentStep === 2 && renderStep2()}
-      {currentStep === 3 && renderStep3()}
-      {currentStep === 4 && renderStep4()}
+        {loading && currentStep === 1 && <StepSkeleton />}
+        {!loading && currentStep === 1 && renderStep1()}
+        {loading && currentStep === 2 && <CardSkeleton />}
+        {!loading && currentStep === 2 && renderStep2()}
+        {loading && (currentStep === 3 || currentStep === 4) && <CardSkeleton />}
+        {!loading && currentStep === 3 && renderStep3()}
+        {!loading && currentStep === 4 && renderStep4()}
     </div>
   );
 }

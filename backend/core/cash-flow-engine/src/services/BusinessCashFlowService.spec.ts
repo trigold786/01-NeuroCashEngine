@@ -85,6 +85,7 @@ describe('BusinessCashFlowService', () => {
     it('should generate forecasts for user within a transaction', async () => {
       const userId = 'user-1';
       mockAccountRepository.find.mockResolvedValue([{ encryptedBalance: 'encrypted_10000' }]);
+      mockEventRepository.find.mockResolvedValue([]);
       mockForecastRepository.create.mockImplementation(data => data);
       mockManager.delete.mockResolvedValue({});
       mockManager.save.mockResolvedValue([]);

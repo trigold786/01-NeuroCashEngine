@@ -57,3 +57,8 @@ body {
 .data-font {
   font-family: var(--font-data);
 }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

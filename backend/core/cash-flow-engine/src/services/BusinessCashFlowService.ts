@@ -174,26 +174,66 @@ export class BusinessCashFlowService {
       totalBalance += decryptBalance(acc.encryptedBalance);
     });
 
-    const forecasts: CashFlowForecast[] = [];
+    const events = await this.eventRepository.find({
+      where: { userId },
+      order: { eventDate: 'ASC' },
+    });
+
     const today = new Date();
-    
+    const forecasts: CashFlowForecast[] = [];
+
     for (let i = 1; i <= days; i++) {
       const forecastDate = new Date(today);
       forecastDate.setDate(today.getDate() + i);
-      
-      const randomFactor = 0.95 + Math.random() * 0.1;
-      const predictedBalance = totalBalance * randomFactor - (i * 1000);
-      
+      const dateStr = forecastDate.toISOString().split('T')[0];
+      const dayOfWeek = forecastDate.getDay();
+      const dayOfMonth = forecastDate.getDate();
+      const month = forecastDate.getMonth();
+
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const isMonthEnd = dayOfMonth >= 25;
+      const isMidMonth = dayOfMonth >= 10 && dayOfMonth <= 15;
+
+      let predictedBalance = totalBalance;
+
+      const dailyBaseDecay = isWeekend ? 200 : 500;
+      predictedBalance -= i * dailyBaseDecay;
+
+      if (isMonthEnd) {
+        predictedBalance -= 5000 + Math.random() * 3000;
+      }
+      if (isMidMonth) {
+        predictedBalance -= 2000 + Math.random() * 1000;
+      }
+
+      const eventDateStr = (d: Date) => d.toISOString().split('T')[0];
+      const matchingEvents = events.filter(e => eventDateStr(e.eventDate) === dateStr);
+      for (const event of matchingEvents) {
+        predictedBalance -= event.amount;
+      }
+
+      const dailyEvents = events.filter(e => {
+        const ed = new Date(e.eventDate);
+        const diffDays = Math.round((ed.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        return diffDays === i && eventDateStr(e.eventDate) !== dateStr;
+      });
+      for (const event of dailyEvents) {
+        predictedBalance -= event.amount;
+      }
+
+      const randomJitter = 0.95 + Math.random() * 0.1;
+      predictedBalance *= randomJitter;
+
       const isAlert = predictedBalance < 50000;
-      
+
       const forecast = this.forecastRepository.create({
         userId,
-        forecastDate: forecastDate.toISOString().split('T')[0],
-        predictedBalance: Math.max(0, predictedBalance),
+        forecastDate: dateStr,
+        predictedBalance: Math.max(0, Math.round(predictedBalance * 100) / 100),
         isAlert,
         alertMessage: isAlert ? '预计资金短缺，请提前准备' : undefined,
       });
-      
+
       forecasts.push(forecast);
     }
 

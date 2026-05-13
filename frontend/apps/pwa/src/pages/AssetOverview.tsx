@@ -12,6 +12,8 @@ import {
 } from 'chart.js';
 import { Page } from '../App';
 import BottomSheet from '../components/BottomSheet';
+import ErrorMessage from '../components/ErrorMessage';
+import { ChartSkeleton, CardSkeleton } from '../components/LoadingSkeleton';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -227,8 +229,13 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
         </div>
       </div>
 
-      {loading && <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>加载中...</p>}
-      {error && <p style={{ color: '#cc0000', textAlign: 'center' }}>{error}</p>}
+      {loading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <CardSkeleton />
+          <ChartSkeleton />
+        </div>
+      )}
+      {error && <ErrorMessage message={error} onRetry={fetchOverview} />}
 
       {overview && (
         <>
