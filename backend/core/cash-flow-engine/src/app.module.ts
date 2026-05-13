@@ -17,6 +17,7 @@ import { BusinessCashFlowService } from './services/BusinessCashFlowService';
 import { SopExportService } from './services/SopExportService';
 import { StrategyService } from './services/StrategyService';
 import { EnterpriseStrategyService } from './services/EnterpriseStrategyService';
+import { PortfolioMonitoringService } from './services/PortfolioMonitoringService';
 import { PointsService } from './services/PointsService';
 import { NSICoordinationService } from './services/NSICoordinationService';
 import { AssetController } from './controllers/AssetController';
@@ -24,6 +25,7 @@ import { CashFlowController } from './controllers/CashFlowController';
 import { BusinessCashFlowController } from './controllers/BusinessCashFlowController';
 import { StrategyController } from './controllers/StrategyController';
 import { EnterpriseStrategyController } from './controllers/EnterpriseStrategyController';
+import { PortfolioMonitoringController } from './controllers/PortfolioMonitoringController';
 import { PointsController } from './controllers/PointsController';
 import { NSICoordinationController } from './controllers/NSICoordinationController';
 
@@ -47,7 +49,7 @@ import { NSICoordinationController } from './controllers/NSICoordinationControll
     }),
     TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent, Points, PointsRecord, ReferralCode]),
   ],
-  providers: [AssetService, CashFlowService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService, PointsService, NSICoordinationService],
-  controllers: [AssetController, CashFlowController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController, PointsController, NSICoordinationController],
+  providers: [AssetService, CashFlowService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService, PortfolioMonitoringService, PointsService, NSICoordinationService],
+  controllers: [AssetController, CashFlowController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController, PortfolioMonitoringController, PointsController, NSICoordinationController],
 })
 export class AppModule {}

@@ -169,7 +169,7 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
       {[1, 2, 3, 4].map((step) => (
         <div key={step} style={{
           flex: 1, height: '4px', borderRadius: '2px',
-          background: currentStep >= step ? '#0066cc' : '#e0e0e0',
+          background: currentStep >= step ? 'var(--brand-blue)' : 'var(--border-color)',
           transition: 'background 0.3s',
         }} />
       ))}
@@ -178,9 +178,9 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
 
   const renderStep1 = () => (
     <div>
-      <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+      <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
         <h2 style={{ marginTop: 0, marginBottom: '24px' }}>企业风险评估问卷</h2>
-        <p style={{ color: '#666', marginBottom: '24px' }}>请回答以下7个问题，我们将为企业推荐合适的投资策略。</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>请回答以下7个问题，我们将为企业推荐合适的投资策略。</p>
         {QUESTIONS.map((question, index) => (
           <div key={question.id} style={{ marginBottom: '24px' }}>
             <p style={{ fontWeight: '500', marginBottom: '12px' }}>{index + 1}. {question.text}</p>
@@ -191,9 +191,9 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
                   onClick={() => handleAnswerChange(question.id, option.value)}
                   style={{
                     padding: '12px 24px', borderRadius: '8px',
-                    border: answers[question.id] === option.value ? '2px solid #0066cc' : '1px solid #ddd',
+                    border: answers[question.id] === option.value ? '2px solid #0066cc' : '1px solid var(--border-color)',
                     background: answers[question.id] === option.value ? '#e6f7ff' : 'white',
-                    color: answers[question.id] === option.value ? '#0066cc' : '#333',
+                    color: answers[question.id] === option.value ? 'var(--brand-blue)' : 'var(--text-primary)',
                     cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s',
                   }}
                 >
@@ -205,8 +205,8 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
         ))}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '32px' }}>
           <button onClick={() => navigateTo('dashboard')} style={{
-            padding: '12px 24px', border: '1px solid #ddd', borderRadius: '4px',
-            background: 'white', cursor: 'pointer', color: '#666',
+            padding: '12px 24px', border: '1px solid var(--border-color)', borderRadius: '4px',
+            background: 'var(--bg-card)', cursor: 'pointer', color: 'var(--text-secondary)',
           }}>
             ← 返回
           </button>
@@ -223,43 +223,44 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
           </button>
         </div>
       </div>
-      {error && <p style={{ color: '#cc0000', textAlign: 'center', marginTop: '16px' }}>{error}</p>}
+      {error && <p style={{ color: 'var(--semantic-red)', textAlign: 'center', marginTop: '16px' }}>{error}</p>}
     </div>
   );
 
   const renderStep2 = () => (
     <div>
-      <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
+      <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '8px', boxShadow: 'var(--shadow-card)', marginBottom: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
           <span style={{
             padding: '4px 12px', borderRadius: '12px',
             backgroundColor: riskProfile ? `${PROFILE_COLORS[riskProfile.profile]}20` : '#e6f7ff',
             color: riskProfile ? PROFILE_COLORS[riskProfile.profile] : '#0066cc',
             fontSize: '14px', fontWeight: '500',
+            border: '1px solid var(--brand-gold)',
           }}>
             得分: {riskProfile?.score}
           </span>
-          <h2 style={{ margin: 0, color: riskProfile ? PROFILE_COLORS[riskProfile.profile] : '#333' }}>
+          <h2 style={{ margin: 0, color: riskProfile ? PROFILE_COLORS[riskProfile.profile] : 'var(--text-primary)' }}>
             {riskProfile ? PROFILE_NAMES[riskProfile.profile] : ''}投资策略
           </h2>
         </div>
-        <p style={{ color: '#666', marginBottom: '0' }}>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '0' }}>
           根据企业问卷评估，推荐以下资产配置方案。
         </p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+        <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
           {getPieData() && <Pie data={getPieData()!} options={pieOptions} />}
         </div>
-        <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+        <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
           <h3 style={{ marginTop: 0, marginBottom: '16px' }}>配置明细</h3>
           {portfolioMetrics?.allocation && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {Object.entries(portfolioMetrics.allocation).map(([type, percentage]) => (
                 <div key={type} style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px',
+                  padding: '12px', backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{
@@ -270,7 +271,7 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
                       {type === 'CASH' ? '现金' : type === 'DEPOSIT' ? '存款' : type === 'FUND' ? '基金' : '股票'}
                     </span>
                   </div>
-                  <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#0066cc' }}>{percentage}%</span>
+                  <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--brand-blue)' }}>{percentage}%</span>
                 </div>
               ))}
             </div>
@@ -280,25 +281,25 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
 
       {portfolioMetrics && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <p style={{ color: '#666', margin: '0 0 8px', fontSize: '14px' }}>预期年化收益</p>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#00cc66', margin: 0 }}>{portfolioMetrics.expectedReturn}%</p>
+          <div style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '8px', boxShadow: 'var(--shadow-card)', textAlign: 'center' }}>
+            <p style={{ color: 'var(--text-secondary)', margin: '0 0 8px', fontSize: '14px' }}>预期年化收益</p>
+            <p className="data-font" style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--semantic-green)', margin: 0 }}>{portfolioMetrics.expectedReturn}%</p>
           </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <p style={{ color: '#666', margin: '0 0 8px', fontSize: '14px' }}>风险等级</p>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#cc6600', margin: 0 }}>{'⭐'.repeat(portfolioMetrics.riskLevel)}</p>
+          <div style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '8px', boxShadow: 'var(--shadow-card)', textAlign: 'center' }}>
+            <p style={{ color: 'var(--text-secondary)', margin: '0 0 8px', fontSize: '14px' }}>风险等级</p>
+            <p style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--brand-gold)', margin: 0 }}>{'⭐'.repeat(portfolioMetrics.riskLevel)}</p>
           </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <p style={{ color: '#666', margin: '0 0 8px', fontSize: '14px' }}>流动性评分</p>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#0066cc', margin: 0 }}>{portfolioMetrics.liquidityScore}/100</p>
+          <div style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '8px', boxShadow: 'var(--shadow-card)', textAlign: 'center' }}>
+            <p style={{ color: 'var(--text-secondary)', margin: '0 0 8px', fontSize: '14px' }}>流动性评分</p>
+            <p style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--brand-blue)', margin: 0 }}>{portfolioMetrics.liquidityScore}/100</p>
           </div>
         </div>
       )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button onClick={() => { setCurrentStep(1); setAnswers({}); }} style={{
-          padding: '12px 24px', border: '1px solid #ddd', borderRadius: '4px',
-          background: 'white', cursor: 'pointer', color: '#666',
+          padding: '12px 24px', border: '1px solid var(--border-color)', borderRadius: '4px',
+          background: 'var(--bg-card)', cursor: 'pointer', color: 'var(--text-secondary)',
         }}>
           ← 重新评估
         </button>
@@ -314,13 +315,13 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
 
   const renderStep3 = () => (
     <div>
-      <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
+      <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '8px', boxShadow: 'var(--shadow-card)', marginBottom: '24px' }}>
         <h2 style={{ marginTop: 0, marginBottom: '16px' }}>推荐产品</h2>
-        <p style={{ color: '#666', marginBottom: 0 }}>根据企业的风险偏好，推荐以下产品：</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 0 }}>根据企业的风险偏好，推荐以下产品：</p>
       </div>
 
       {products.length > 0 && (
-        <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
+        <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '8px', boxShadow: 'var(--shadow-card)', marginBottom: '24px' }}>
           <Bar data={getProductBarData()} options={barOptions} />
         </div>
       )}
@@ -328,7 +329,7 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
         {products.map((product) => (
           <div key={product.id} style={{
-            background: 'white', padding: '20px', borderRadius: '8px',
+            background: 'var(--bg-card)', padding: '20px', borderRadius: '8px',
             boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
             borderLeft: `4px solid ${product.riskLevel === 1 ? '#00cc66' : product.riskLevel === 2 ? '#0066cc' : '#cc6600'}`,
           }}>
@@ -337,25 +338,25 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
                 <h3 style={{ margin: 0, marginBottom: '4px' }}>{product.name}</h3>
                 <span style={{
                   display: 'inline-block', padding: '2px 8px', fontSize: '12px', borderRadius: '4px',
-                  backgroundColor: '#f0f0f0', color: '#666', marginRight: '8px',
+                  backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)', marginRight: '8px',
                 }}>
                   流动性: {product.liquidityDays}天
                 </span>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#00cc66' }}>{product.expectedReturn}%</p>
-                <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>预期年化收益</p>
+                <p className="data-font" style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: 'var(--semantic-green)' }}>{product.expectedReturn}%</p>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-tertiary)' }}>预期年化收益</p>
               </div>
             </div>
-            <p style={{ margin: 0, color: '#666', fontSize: '14px' }}>{product.description}</p>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '14px' }}>{product.description}</p>
           </div>
         ))}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button onClick={() => setCurrentStep(2)} style={{
-          padding: '12px 24px', border: '1px solid #ddd', borderRadius: '4px',
-          background: 'white', cursor: 'pointer', color: '#666',
+          padding: '12px 24px', border: '1px solid var(--border-color)', borderRadius: '4px',
+          background: 'var(--bg-card)', cursor: 'pointer', color: 'var(--text-secondary)',
         }}>
           ← 返回配置方案
         </button>
@@ -371,60 +372,62 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
 
   const renderStep4 = () => (
     <div>
-      <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
+      <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '8px', boxShadow: 'var(--shadow-card)', marginBottom: '24px' }}>
         <h2 style={{ marginTop: 0, marginBottom: '16px' }}>策略模板详情</h2>
-        <p style={{ color: '#666', marginBottom: 0 }}>选择适合企业的策略模板并参考执行指南。以下为所有可用模板：</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 0 }}>选择适合企业的策略模板并参考执行指南。以下为所有可用模板：</p>
       </div>
 
       {templates.map((template) => (
         <div key={template.id} style={{
-          background: 'white', padding: '24px', borderRadius: '8px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)', marginBottom: '16px',
+          background: 'var(--bg-card)', padding: '24px', borderRadius: '8px',
+          boxShadow: 'var(--shadow-card)', marginBottom: '16px',
+          borderLeft: (() => { const tp = template.id.includes('CON') ? 'conservative' : template.id.includes('STA') ? 'stable' : 'aggressive'; return riskProfile?.profile === tp ? '4px solid var(--brand-gold)' : 'none'; })(),
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <h3 style={{ margin: 0, color: '#0066cc' }}>{template.name}</h3>
+            <h3 style={{ margin: 0, color: 'var(--brand-blue)' }}>{template.name}</h3>
             {(() => {
               const templateProfile = template.id.includes('CON') ? 'conservative' : template.id.includes('STA') ? 'stable' : 'aggressive';
               const isRecommended = riskProfile?.profile === templateProfile;
               return (
                 <span style={{
                   padding: '2px 10px', borderRadius: '12px', fontSize: '12px',
-                  backgroundColor: isRecommended ? '#e6f7ff' : '#f0f0f0',
-                  color: isRecommended ? '#0066cc' : '#999',
+                  backgroundColor: isRecommended ? '#fef7e0' : 'var(--bg-secondary)',
+                  color: isRecommended ? 'var(--brand-gold)' : 'var(--text-tertiary)',
+                  border: isRecommended ? '1px solid var(--brand-gold)' : 'none',
                 }}>
-                  {isRecommended ? '✓ 推荐' : '可选'}
+                  {isRecommended ? '★ 推荐' : '可选'}
                 </span>
               );
             })()}
           </div>
-          <p style={{ color: '#666', margin: '0 0 8px', fontSize: '14px' }}>
+          <p style={{ color: 'var(--text-secondary)', margin: '0 0 8px', fontSize: '14px' }}>
             <strong>{template.description}</strong>
           </p>
-          <p style={{ color: '#333', margin: '0 0 8px', fontSize: '14px' }}>
+          <p style={{ color: 'var(--text-primary)', margin: '0 0 8px', fontSize: '14px' }}>
             <strong>适合对象：</strong>{template.suitableFor}
           </p>
-          <p style={{ color: '#333', margin: '0 0 12px', fontSize: '14px' }}>
+          <p style={{ color: 'var(--text-primary)', margin: '0 0 12px', fontSize: '14px' }}>
             <strong>执行指南：</strong>{template.executionGuide}
           </p>
           <div style={{
-            background: '#f9f9f9', padding: '12px', borderRadius: '8px',
+            background: 'var(--bg-secondary)', padding: '12px', borderRadius: 'var(--radius-md)',
             display: 'flex', gap: '16px', justifyContent: 'space-around',
           }}>
             <div style={{ textAlign: 'center' }}>
-              <span style={{ fontSize: '12px', color: '#666' }}>现金</span>
-              <p style={{ margin: '4px 0 0', fontWeight: 'bold', color: '#00cc66' }}>{template.allocation.CASH}%</p>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>现金</span>
+              <p style={{ margin: '4px 0 0', fontWeight: 'bold', color: 'var(--semantic-green)' }}>{template.allocation.CASH}%</p>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <span style={{ fontSize: '12px', color: '#666' }}>存款</span>
-              <p style={{ margin: '4px 0 0', fontWeight: 'bold', color: '#0066cc' }}>{template.allocation.DEPOSIT}%</p>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>存款</span>
+              <p style={{ margin: '4px 0 0', fontWeight: 'bold', color: 'var(--brand-blue)' }}>{template.allocation.DEPOSIT}%</p>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <span style={{ fontSize: '12px', color: '#666' }}>基金</span>
-              <p style={{ margin: '4px 0 0', fontWeight: 'bold', color: '#cc6600' }}>{template.allocation.FUND}%</p>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>基金</span>
+              <p style={{ margin: '4px 0 0', fontWeight: 'bold', color: 'var(--brand-gold)' }}>{template.allocation.FUND}%</p>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <span style={{ fontSize: '12px', color: '#666' }}>股票</span>
-              <p style={{ margin: '4px 0 0', fontWeight: 'bold', color: '#cc0000' }}>{template.allocation.STOCK}%</p>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>股票</span>
+              <p style={{ margin: '4px 0 0', fontWeight: 'bold', color: 'var(--semantic-red)' }}>{template.allocation.STOCK}%</p>
             </div>
           </div>
         </div>
@@ -432,17 +435,25 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button onClick={() => setCurrentStep(3)} style={{
-          padding: '12px 24px', border: '1px solid #ddd', borderRadius: '4px',
-          background: 'white', cursor: 'pointer', color: '#666',
+          padding: '12px 24px', border: '1px solid var(--border-color)', borderRadius: '4px',
+          background: 'var(--bg-card)', cursor: 'pointer', color: 'var(--text-secondary)',
         }}>
           ← 返回产品列表
         </button>
-        <button onClick={() => navigateTo('dashboard')} style={{
-          padding: '12px 32px', borderRadius: '4px', border: 'none',
-          background: '#0066cc', color: 'white', cursor: 'pointer', fontSize: '16px',
-        }}>
-          返回控制台
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={() => navigateTo('portfolio-monitoring')} style={{
+            padding: '12px 24px', borderRadius: '4px', border: '1px solid #0066cc',
+            background: 'var(--bg-card)', color: 'var(--brand-blue)', cursor: 'pointer', fontSize: '16px',
+          }}>
+            进入组合监控 →
+          </button>
+          <button onClick={() => navigateTo('dashboard')} style={{
+            padding: '12px 32px', borderRadius: '4px', border: 'none',
+            background: '#0066cc', color: 'white', cursor: 'pointer', fontSize: '16px',
+          }}>
+            返回控制台
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -453,8 +464,8 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
         <button
           onClick={() => navigateTo('dashboard')}
           style={{
-            background: 'white', border: '1px solid #ddd', borderRadius: '4px',
-            padding: '8px 16px', cursor: 'pointer', color: '#666', marginBottom: '12px',
+            background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '4px',
+            padding: '8px 16px', cursor: 'pointer', color: 'var(--text-secondary)', marginBottom: '12px',
           }}
         >
           ← 返回控制台

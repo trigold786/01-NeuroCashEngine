@@ -102,8 +102,8 @@ export default function PointsCenter({ navigateTo }: PointsCenterProps) {
         <button
           onClick={() => navigateTo('dashboard')}
           style={{
-            background: 'white', border: '1px solid #ddd', borderRadius: '4px',
-            padding: '8px 16px', cursor: 'pointer', color: '#666', marginBottom: '12px',
+            background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '4px',
+            padding: '8px 16px', cursor: 'pointer', color: 'var(--text-secondary)', marginBottom: '12px',
           }}
         >
           ← 返回控制台
@@ -114,10 +114,10 @@ export default function PointsCenter({ navigateTo }: PointsCenterProps) {
       {message && (
         <div style={{
           padding: '12px 16px', backgroundColor: '#e6f7ff', border: '1px solid #91d5ff',
-          borderRadius: '6px', marginBottom: '16px', color: '#0066cc',
+          borderRadius: '6px', marginBottom: '16px', color: 'var(--brand-blue)',
         }}>
           {message}
-          <button onClick={() => setMessage(null)} style={{ float: 'right', border: 'none', background: 'none', cursor: 'pointer', color: '#0066cc' }}>×</button>
+          <button onClick={() => setMessage(null)} style={{ float: 'right', border: 'none', background: 'none', cursor: 'pointer', color: 'var(--brand-blue)' }}>×</button>
         </div>
       )}
 
@@ -142,12 +142,12 @@ export default function PointsCenter({ navigateTo }: PointsCenterProps) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
-        <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-          <h3 style={{ margin: '0 0 12px', color: '#0066cc' }}>我的推荐码</h3>
+        <div style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '8px', boxShadow: 'var(--shadow-card)' }}>
+          <h3 style={{ margin: '0 0 12px', color: 'var(--brand-blue)' }}>我的推荐码</h3>
           {referralCode ? (
             <div>
               <div style={{
-                padding: '12px', background: '#f5f7fa', borderRadius: '6px',
+                padding: '12px', background: 'var(--bg-secondary)', borderRadius: '6px',
                 fontFamily: 'monospace', fontSize: '24px', textAlign: 'center',
                 letterSpacing: '4px', marginBottom: '8px', cursor: 'pointer',
               }}
@@ -156,7 +156,7 @@ export default function PointsCenter({ navigateTo }: PointsCenterProps) {
               >
                 {referralCode.code}
               </div>
-              <p style={{ color: '#666', fontSize: '12px', textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '12px', textAlign: 'center' }}>
                 已使用 {referralCode.usedCount} 次 | 点击复制
               </p>
             </div>
@@ -171,13 +171,13 @@ export default function PointsCenter({ navigateTo }: PointsCenterProps) {
               生成推荐码
             </button>
           )}
-          <p style={{ color: '#999', fontSize: '12px', margin: '8px 0 0' }}>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: '12px', margin: '8px 0 0' }}>
             推荐好友注册，您获得100积分，好友获得50积分
           </p>
         </div>
 
-        <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-          <h3 style={{ margin: '0 0 12px', color: '#cc6600' }}>兑换推荐码</h3>
+        <div style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '8px', boxShadow: 'var(--shadow-card)' }}>
+          <h3 style={{ margin: '0 0 12px', color: 'var(--brand-gold)' }}>兑换推荐码</h3>
           <div style={{ display: 'flex', gap: '8px' }}>
             <input
               value={redeemInput}
@@ -185,7 +185,7 @@ export default function PointsCenter({ navigateTo }: PointsCenterProps) {
               placeholder="输入8位推荐码"
               maxLength={8}
               style={{
-                flex: 1, padding: '10px', border: '1px solid #ddd', borderRadius: '4px',
+                flex: 1, padding: '10px', border: '1px solid var(--border-color)', borderRadius: '4px',
                 fontFamily: 'monospace', fontSize: '16px', letterSpacing: '2px',
               }}
             />
@@ -203,31 +203,31 @@ export default function PointsCenter({ navigateTo }: PointsCenterProps) {
         </div>
       </div>
 
-      <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-        <h3 style={{ margin: '0 0 16px', color: '#333' }}>积分记录</h3>
+      <div style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '8px', boxShadow: 'var(--shadow-card)' }}>
+        <h3 style={{ margin: '0 0 16px', color: 'var(--text-primary)' }}>积分记录</h3>
         {history.length === 0 ? (
-          <p style={{ color: '#999', textAlign: 'center' }}>暂无积分记录</p>
+          <p style={{ color: 'var(--text-tertiary)', textAlign: 'center' }}>暂无积分记录</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {history.map((record) => (
               <div key={record.recordId} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '6px',
+                padding: '12px', backgroundColor: 'var(--bg-secondary)', borderRadius: '6px',
               }}>
                 <div>
                   <p style={{ margin: '0 0 4px', fontWeight: '500' }}>
                     {record.reason === 'referral' ? '推荐奖励' : record.reason === 'signin' ? '签到奖励' : record.reason === 'redeem' ? '积分兑换' : record.reason}
                   </p>
                   {record.description && (
-                    <p style={{ margin: 0, color: '#666', fontSize: '12px' }}>{record.description}</p>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '12px' }}>{record.description}</p>
                   )}
-                  <p style={{ margin: 0, color: '#999', fontSize: '11px' }}>
+                  <p style={{ margin: 0, color: 'var(--text-tertiary)', fontSize: '11px' }}>
                     {new Date(record.createdAt).toLocaleString('zh-CN')}
                   </p>
                 </div>
                 <span className="data-font" style={{
                   fontSize: '20px', fontWeight: 'bold',
-                  color: record.amount > 0 ? '#00cc66' : '#cc0000',
+                  color: record.amount > 0 ? 'var(--semantic-green)' : 'var(--semantic-red)',
                 }}>
                   {record.amount > 0 ? '+' : ''}{record.amount}
                 </span>

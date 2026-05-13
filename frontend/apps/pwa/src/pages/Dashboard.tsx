@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useAuthStore, useBusinessStore, AccountType, UserRole } from '@nce/shared';
+import { useAuthStore, useBusinessStore, AccountType, UserRole, useNewsStore, NewsCategory } from '@nce/shared';
 import { useAssetStore } from '@nce/shared';
 import { Page } from '../App';
 
 interface DashboardProps {
   navigateTo: (page: Page) => void;
+  setCurrentNewsId?: (id: string) => void;
 }
 
 function formatCurrency(value: number): string {
@@ -17,16 +18,18 @@ function formatReturn(value: number, isMasked: boolean): string {
   return `${prefix}¥${Math.abs(value).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-export default function Dashboard({ navigateTo }: DashboardProps) {
+export default function Dashboard({ navigateTo, setCurrentNewsId }: DashboardProps) {
   const { user, logout } = useAuthStore();
   const { fetchIndustries } = useBusinessStore();
   const { accounts, fetchOverview } = useAssetStore();
+  const { newsList, fetchNewsList } = useNewsStore();
   const [isMasked, setIsMasked] = useState(false);
 
   useEffect(() => {
     fetchIndustries();
     fetchOverview();
-  }, [fetchIndustries, fetchOverview]);
+    fetchNewsList({ limit: 5 });
+  }, [fetchIndustries, fetchOverview, fetchNewsList]);
 
   const isBusinessUser = user?.accountType === AccountType.ENTERPRISE || user?.role === UserRole.ENTERPRISE;
 
@@ -51,7 +54,7 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
 
   const yesterdayReturn = cumulativeReturn * (Math.random() * 0.1 - 0.02);
 
-  const getReturnColor = (value: number) => value >= 0 ? '#00cc66' : '#cc0000';
+  const getReturnColor = (value: number) => value >= 0 ? 'var(--semantic-green)' : 'var(--semantic-red)';
 
   return (
     <div style={{ padding: '20px' }}>
@@ -64,17 +67,17 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
         <h1>NeuroCashEngine 控制台</h1>
         <button
           onClick={logout}
-          style={{ padding: '10px 20px', backgroundColor: '#cc0000', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+          style={{ padding: '10px 20px', backgroundColor: 'var(--semantic-red)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
         >
           退出登录
         </button>
       </div>
 
       <div style={{
-        background: 'white',
+        background: 'var(--bg-card)',
         padding: '20px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        borderRadius: 'var(--radius-md)',
+        boxShadow: 'var(--shadow-card)',
         marginBottom: '24px'
       }}>
         <h2>欢迎，{user?.username}！</h2>
@@ -97,7 +100,10 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
         <div style={{ display: 'flex', gap: '24px', flex: 1 }}>
           <div>
             <div style={{ fontSize: '12px', opacity: 0.9, marginBottom: '4px' }}>总资产</div>
-            <div className="data-font" style={{ fontSize: '24px', fontWeight: 'bold' }}>{isMasked ? '***' : formatCurrency(totalAssets)}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="data-font" style={{ fontSize: '24px', fontWeight: 'bold' }}>{isMasked ? '***' : formatCurrency(totalAssets)}</div>
+              <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', background: 'var(--brand-gold)', color: '#fff' }}>VIP</span>
+            </div>
           </div>
           <div style={{ borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '24px' }}>
             <div style={{ fontSize: '12px', opacity: 0.9, marginBottom: '4px' }}>昨日收益</div>
@@ -131,10 +137,10 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
         <div
           style={{
-            background: 'white',
+            background: 'var(--bg-card)',
             padding: '24px',
             borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            boxShadow: 'var(--shadow-card)',
             cursor: 'pointer',
             transition: 'transform 0.2s',
           }}
@@ -142,16 +148,16 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           onClick={() => navigateTo('assets')}
         >
-          <h3 style={{ color: '#0066cc', marginBottom: '8px' }}>📊 资产概览</h3>
-          <p style={{ color: '#666' }}>查看和管理您的资产配置</p>
+          <h3 style={{ color: 'var(--brand-blue)', marginBottom: '8px' }}>📊 资产概览</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>查看和管理您的资产配置</p>
         </div>
 
         <div
           style={{
-            background: 'white',
+            background: 'var(--bg-card)',
             padding: '24px',
             borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            boxShadow: 'var(--shadow-card)',
             cursor: 'pointer',
             transition: 'transform 0.2s',
           }}
@@ -159,16 +165,16 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           onClick={() => navigateTo('strategy')}
         >
-          <h3 style={{ color: '#0066cc', marginBottom: '8px' }}>💹 投资策略</h3>
-          <p style={{ color: '#666' }}>风险评估与资产配置推荐</p>
+          <h3 style={{ color: 'var(--brand-blue)', marginBottom: '8px' }}>💹 投资策略</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>风险评估与资产配置推荐</p>
         </div>
 
         <div
           style={{
-            background: 'white',
+            background: 'var(--bg-card)',
             padding: '24px',
             borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            boxShadow: 'var(--shadow-card)',
             cursor: 'pointer',
             transition: 'transform 0.2s',
           }}
@@ -176,16 +182,16 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           onClick={() => navigateTo('news')}
         >
-          <h3 style={{ color: '#0066cc', marginBottom: '8px' }}>📰 资讯中心</h3>
-          <p style={{ color: '#666' }}>查看最新的金融市场资讯</p>
+          <h3 style={{ color: 'var(--brand-blue)', marginBottom: '8px' }}>📰 资讯中心</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>查看最新的金融市场资讯</p>
         </div>
 
         <div
           style={{
-            background: 'white',
+            background: 'var(--bg-card)',
             padding: '24px',
             borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            boxShadow: 'var(--shadow-card)',
             cursor: 'pointer',
             transition: 'transform 0.2s',
           }}
@@ -194,7 +200,7 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
           onClick={() => navigateTo('points')}
         >
           <h3 style={{ color: '#667eea', marginBottom: '8px' }}>🎯 积分中心</h3>
-          <p style={{ color: '#666' }}>积分查询、推荐码管理与兑换</p>
+          <p style={{ color: 'var(--text-secondary)' }}>积分查询、推荐码管理与兑换</p>
         </div>
 
         {isBusinessUser && (
@@ -210,10 +216,10 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
               }}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-              onClick={() => navigateTo('enterprise-strategy')}
+              onClick={() => navigateTo('portfolio-monitoring')}
             >
-              <h3 style={{ color: '#cc6600', marginBottom: '8px' }}>💼 企业投资策略</h3>
-              <p style={{ color: '#666' }}>企业风险评估与投资策略推荐</p>
+              <h3 style={{ color: 'var(--brand-blue)', marginBottom: '8px' }}>📊 组合监控</h3>
+              <p style={{ color: 'var(--text-secondary)' }}>实时监控组合持仓、盈亏与偏离度</p>
             </div>
 
             <div
@@ -222,6 +228,23 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
                 padding: '24px',
                 borderRadius: '8px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                cursor: 'pointer',
+                transition: 'transform 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              onClick={() => navigateTo('enterprise-strategy')}
+            >
+              <h3 style={{ color: '#cc6600', marginBottom: '8px' }}>💼 企业投资策略</h3>
+              <p style={{ color: 'var(--text-secondary)' }}>企业风险评估与投资策略推荐</p>
+            </div>
+
+            <div
+              style={{
+                background: 'var(--bg-card)',
+                padding: '24px',
+                borderRadius: '8px',
+                boxShadow: 'var(--shadow-card)',
                 cursor: 'pointer',
                 transition: 'transform 0.2s',
               }}
@@ -230,15 +253,15 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
               onClick={() => navigateTo('business-cashflow')}
             >
               <h3 style={{ color: '#cc6600', marginBottom: '8px' }}>📈 现金流预测</h3>
-              <p style={{ color: '#666' }}>查看企业现金流预测和预警</p>
+              <p style={{ color: 'var(--text-secondary)' }}>查看企业现金流预测和预警</p>
             </div>
 
             <div
               style={{
-                background: 'white',
+                background: 'var(--bg-card)',
                 padding: '24px',
                 borderRadius: '8px',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                boxShadow: 'var(--shadow-card)',
                 cursor: 'pointer',
                 transition: 'transform 0.2s',
               }}
@@ -247,10 +270,86 @@ export default function Dashboard({ navigateTo }: DashboardProps) {
               onClick={() => navigateTo('business-sops')}
             >
               <h3 style={{ color: '#cc6600', marginBottom: '8px' }}>📋 SOP管理</h3>
-              <p style={{ color: '#666' }}>生成和管理资金调拨SOP文档</p>
+              <p style={{ color: 'var(--text-secondary)' }}>生成和管理资金调拨SOP文档</p>
             </div>
           </>
         )}
+      </div>
+
+      <div style={{
+        background: 'var(--bg-card)',
+        borderRadius: '8px',
+        boxShadow: 'var(--shadow-card)',
+        marginTop: '24px',
+        overflow: 'hidden'
+      }}>
+        <div style={{
+          padding: '16px 20px',
+          borderBottom: '1px solid var(--border-color)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <h3 style={{ margin: 0 }}>📰 最新资讯</h3>
+          <button
+            onClick={() => navigateTo('news')}
+            style={{
+              padding: '4px 12px',
+              border: '1px solid #0066cc',
+              borderRadius: '4px',
+              background: 'var(--bg-card)',
+              color: 'var(--brand-blue)',
+              cursor: 'pointer',
+              fontSize: '12px',
+            }}
+          >
+            查看全部
+          </button>
+        </div>
+        <div style={{ padding: '0 20px' }}>
+          {newsList.length === 0 ? (
+            <p style={{ color: 'var(--text-tertiary)', textAlign: 'center', padding: '24px 0', margin: 0 }}>暂无资讯</p>
+          ) : (
+            newsList.slice(0, 5).map((news) => (
+              <div
+                key={news.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '14px 0',
+                  borderBottom: '1px solid var(--border-color)',
+                  cursor: 'pointer',
+                }}
+                onClick={() => {
+                  if (setCurrentNewsId) setCurrentNewsId(news.id);
+                  navigateTo('news-detail');
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                    <span style={{
+                      padding: '1px 6px',
+                      fontSize: '11px',
+                      borderRadius: '8px',
+                      backgroundColor: 'var(--bg-secondary)',
+                      color: 'var(--text-secondary)',
+                    }}>
+                      {news.category === NewsCategory.GENERAL ? '综合' : news.category === NewsCategory.STOCK ? '股票' : news.category === NewsCategory.FUND ? '基金' : news.category === NewsCategory.BOND ? '债券' : '宏观'}
+                    </span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{news.sourceName}</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '14px', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {news.title}
+                  </p>
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', whiteSpace: 'nowrap', marginLeft: '12px' }}>
+                  {news.publishTime ? new Date(news.publishTime).toLocaleDateString('zh-CN') : ''}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

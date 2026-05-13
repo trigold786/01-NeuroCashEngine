@@ -47,12 +47,12 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
         <button
           onClick={() => navigateTo('dashboard')}
           style={{
-            background: 'white',
-            border: '1px solid #ddd',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
             borderRadius: '4px',
             padding: '8px 16px',
             cursor: 'pointer',
-            color: '#666',
+            color: 'var(--text-secondary)',
             marginBottom: '12px'
           }}
         >
@@ -66,9 +66,9 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
           flexWrap: 'wrap' as const,
           gap: '12px',
           padding: '16px',
-          background: 'white',
+          background: 'var(--bg-card)',
           borderRadius: '8px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+          boxShadow: 'var(--shadow-card)'
         }}>
           {/* 搜索框 */}
           <div style={{ flex: 1, minWidth: '240px' }}>
@@ -81,7 +81,7 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
                 width: '100%',
                 padding: '10px 14px',
                 borderRadius: '4px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 fontSize: '14px'
               }}
             />
@@ -94,7 +94,7 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
             style={{
               padding: '10px 14px',
               borderRadius: '4px',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-color)',
               fontSize: '14px',
               minWidth: '120px'
             }}
@@ -111,7 +111,7 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
             style={{
               padding: '10px 14px',
               borderRadius: '4px',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-color)',
               fontSize: '14px',
               minWidth: '120px'
             }}
@@ -123,25 +123,25 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
         </div>
       </div>
 
-      {loading && <p style={{ textAlign: 'center', color: '#666' }}>加载中...</p>}
-      {error && <p style={{ color: '#cc0000', textAlign: 'center' }}>{error}</p>}
+      {loading && <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>加载中...</p>}
+      {error && <p style={{ color: 'var(--semantic-red)', textAlign: 'center' }}>{error}</p>}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {newsList.map((news) => (
           <div
             key={news.id}
             style={{
-              background: 'white',
+              background: 'var(--bg-card)',
               padding: '20px',
               borderRadius: '8px',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+              boxShadow: 'var(--shadow-card)',
               cursor: 'pointer',
               transition: 'transform 0.2s, box-shadow 0.2s',
             }}
             onClick={() => handleNewsClick(news)}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
@@ -155,7 +155,7 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
                   fontSize: '12px',
                   borderRadius: '12px',
                   backgroundColor: news.sourceType === NewsSourceType.OFFICIAL ? '#e6f7ff' : '#f6ffed',
-                  color: news.sourceType === NewsSourceType.OFFICIAL ? '#0066cc' : '#00cc66'
+                  color: news.sourceType === NewsSourceType.OFFICIAL ? 'var(--brand-blue)' : 'var(--semantic-green)'
                 }}
               >
                 {getSourceTypeLabel(news.sourceType)}
@@ -165,8 +165,8 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
                   padding: '2px 8px',
                   fontSize: '12px',
                   borderRadius: '12px',
-                  backgroundColor: '#f5f5f5',
-                  color: '#666'
+                  backgroundColor: 'var(--bg-secondary)',
+                  color: 'var(--text-secondary)'
                 }}
               >
                 {categories.find(c => c.key === news.category)?.label || news.category}
@@ -176,10 +176,10 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
             <h3 style={{ fontSize: '18px', marginBottom: '8px' }}>{news.title}</h3>
 
             {news.summary && (
-              <p style={{ color: '#666', fontSize: '14px', marginBottom: '12px' }}>{news.summary}</p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '12px' }}>{news.summary}</p>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#999', fontSize: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-tertiary)', fontSize: '12px' }}>
               <span>{[news.sourceName, news.author, news.publishTime ? new Date(news.publishTime).toLocaleDateString('zh-CN') : null].filter(Boolean).join(' · ')}</span>
               <span>{news.viewCount} 阅读</span>
             </div>
@@ -188,7 +188,7 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
       </div>
 
       {!loading && newsList.length === 0 && (
-        <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>
+        <p style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: '40px 0' }}>
           暂无资讯
         </p>
       )}

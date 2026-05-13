@@ -19,15 +19,15 @@ export default function Login() {
       gap: '15px', 
       width: '100%', 
       maxWidth: '400px',
-      background: 'white',
+      background: 'var(--bg-card)',
       padding: '30px',
       borderRadius: '8px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+      boxShadow: 'var(--shadow-card)'
     }}>
       <h2 style={{ marginBottom: '10px' }}>登录</h2>
       
       {error && (
-        <p style={{ color: '#cc0000', fontSize: '14px' }}>{error}</p>
+        <p style={{ color: 'var(--semantic-red)', fontSize: '14px' }}>{error}</p>
       )}
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -38,7 +38,7 @@ export default function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+          style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
         />
       </div>
       
@@ -50,7 +50,7 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+          style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
         />
       </div>
       

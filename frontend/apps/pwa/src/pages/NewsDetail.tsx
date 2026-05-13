@@ -39,26 +39,26 @@ export default function NewsDetail({ navigateTo, newsId }: NewsDetailProps) {
         <button
           onClick={() => navigateTo('news')}
           style={{
-            background: 'white',
-            border: '1px solid #ddd',
+background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
             borderRadius: '4px',
             padding: '8px 16px',
             cursor: 'pointer',
-            color: '#666',
+            color: 'var(--text-secondary)',
           }}
         >
           ← 返回资讯列表
         </button>
       </div>
 
-      {loading && <p style={{ textAlign: 'center', color: '#666' }}>加载中...</p>}
-      {error && <p style={{ color: '#cc0000', textAlign: 'center' }}>{error}</p>}
+      {loading && <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>加载中...</p>}
+      {error && <p style={{ color: 'var(--semantic-red)', textAlign: 'center' }}>{error}</p>}
 
       {currentNews && (
         <div style={{
           background: 'white',
           borderRadius: '8px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          boxShadow: 'var(--shadow-card)',
           padding: '32px',
           maxWidth: '800px',
           margin: '0 auto'
@@ -70,7 +70,7 @@ export default function NewsDetail({ navigateTo, newsId }: NewsDetailProps) {
                 fontSize: '12px',
                 borderRadius: '12px',
                 backgroundColor: currentNews.sourceType === NewsSourceType.OFFICIAL ? '#e6f7ff' : '#f6ffed',
-                color: currentNews.sourceType === NewsSourceType.OFFICIAL ? '#0066cc' : '#00cc66'
+                color: currentNews.sourceType === NewsSourceType.OFFICIAL ? 'var(--brand-blue)' : 'var(--semantic-green)'
               }}
             >
               {getSourceTypeLabel(currentNews.sourceType)}
@@ -80,7 +80,7 @@ export default function NewsDetail({ navigateTo, newsId }: NewsDetailProps) {
               fontSize: '12px',
               borderRadius: '12px',
               backgroundColor: '#fff7e6',
-              color: '#cc6600',
+              color: 'var(--brand-gold)',
             }}>
               {currentNews.sourceType === NewsSourceType.OFFICIAL ? '来源: 官方渠道' : '来源: 已验证渠道'}
             </span>
@@ -89,8 +89,8 @@ export default function NewsDetail({ navigateTo, newsId }: NewsDetailProps) {
                 padding: '2px 8px',
                 fontSize: '12px',
                 borderRadius: '12px',
-                backgroundColor: '#f5f5f5',
-                color: '#666'
+                backgroundColor: 'var(--bg-secondary)',
+color: 'var(--text-secondary)'
               }}
             >
               {getCategoryLabel(currentNews.category)}
@@ -102,20 +102,20 @@ export default function NewsDetail({ navigateTo, newsId }: NewsDetailProps) {
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
-            color: '#999',
+            color: 'var(--text-tertiary)',
             fontSize: '14px',
             marginBottom: '24px',
             paddingBottom: '16px',
-            borderBottom: '1px solid #eee',
+            borderBottom: '1px solid var(--border-color)',
             flexWrap: 'wrap',
             gap: '8px'
           }}>
             <span>来源：{currentNews.sourceName}{currentNews.author ? ` | 作者：${currentNews.author}` : ''}{currentNews.publishTime ? ` | 发布时间：${new Date(currentNews.publishTime).toLocaleString('zh-CN')}` : ''}</span>
-            {currentNews.sourceUrl && <a href={currentNews.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0066cc' }}>查看原文 →</a>}
+            {currentNews.sourceUrl && <a href={currentNews.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--brand-blue)' }}>查看原文 →</a>}
             <span>阅读：{currentNews.viewCount}</span>
           </div>
 
-          <div style={{ fontSize: '16px', lineHeight: '1.8', color: '#333', whiteSpace: 'pre-wrap' }}>
+          <div style={{ fontSize: '16px', lineHeight: '1.8', color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>
             {currentNews.content}
           </div>
         </div>

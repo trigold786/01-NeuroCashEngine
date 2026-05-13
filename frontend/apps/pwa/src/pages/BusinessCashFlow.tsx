@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useBusinessStore, SopType, EventType } from '@nce/shared';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { Page } from '../App';
+import BottomSheet from '../components/BottomSheet';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, annotationPlugin);
 
@@ -11,10 +12,35 @@ interface BusinessCashFlowProps {
   navigateTo: (page: Page) => void;
 }
 
+const SOP_CARDS = [
+  {
+    id: 'redeem',
+    icon: '🔄',
+    title: '短期理财赎回',
+    desc: '赎回即将到期的短期理财产品，补充流动资金缺口',
+    sopType: SopType.SHORTAGE,
+  },
+  {
+    id: 'supply-chain',
+    icon: '🔗',
+    title: '供应链金融借款',
+    desc: '基于应收账款申请供应链金融融资，快速获取资金',
+    sopType: SopType.LOAN_DUE,
+  },
+  {
+    id: 'internal-transfer',
+    icon: '🏢',
+    title: '内部资金调拨',
+    desc: '从其他账户调拨闲置资金，优化资金使用效率',
+    sopType: SopType.SURPLUS,
+  },
+];
+
 export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) {
   const {
     forecasts,
     events,
+    sops,
     loading,
     error,
     fetchForecasts,
@@ -23,6 +49,8 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
     generateForecast,
     generateSop,
   } = useBusinessStore();
+  const [showSopSheet, setShowSopSheet] = useState(false);
+  const [selectedSopCard, setSelectedSopCard] = useState<string | null>(null);
 
   useEffect(() => {
     fetchForecasts();
@@ -110,12 +138,12 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
           <button
             onClick={() => navigateTo('dashboard')}
             style={{
-              background: 'white',
-              border: '1px solid #ddd',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
               borderRadius: '4px',
               padding: '8px 16px',
               cursor: 'pointer',
-              color: '#666',
+              color: 'var(--text-secondary)',
               marginBottom: '8px'
             }}
           >
@@ -160,7 +188,7 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
         </div>
       </div>
 
-      {error && <p style={{ color: '#cc0000', textAlign: 'center' }}>{error}</p>}
+      {error && <p style={{ color: 'var(--semantic-red)', textAlign: 'center' }}>{error}</p>}
 
       {/* 预警横幅 */}
       {alerts.length > 0 && (
@@ -179,9 +207,9 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
             padding: '16px',
             marginBottom: '24px'
           }}>
-            <h3 style={{ color: '#cc0000', marginTop: 0, marginBottom: '12px' }}>⚠️ 预警信息</h3>
+            <h3 style={{ color: 'var(--semantic-red)', marginTop: 0, marginBottom: '12px' }}>⚠️ 预警信息</h3>
             <p>未来有 {alerts.length} 次可能的资金短缺</p>
-            <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#cc0000', margin: '12px 0' }}>
+            <p className="data-font" style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--semantic-red)', margin: '12px 0' }}>
               ⏰ 预计 {daysDiff} 天后存在 ¥{Number(nearestAlert.predictedBalance).toLocaleString('zh-CN', { minimumFractionDigits: 2 })} 资金缺口
             </p>
           <button
@@ -205,10 +233,10 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
 
       {/* 预测图表 */}
       <div style={{
-        background: 'white',
+        background: 'var(--bg-card)',
         padding: '24px',
         borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        boxShadow: 'var(--shadow-card)',
         marginBottom: '24px'
       }}>
         <h3 style={{ marginTop: 0, marginBottom: '16px' }}>未来现金流预测</h3>
@@ -217,23 +245,82 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
             <Line data={chartData} options={chartOptions} />
           </div>
         ) : (
-          <p style={{ color: '#999', textAlign: 'center' }}>暂无预测数据，请点击生成预测</p>
+          <p style={{ color: 'var(--text-tertiary)', textAlign: 'center' }}>暂无预测数据，请点击生成预测</p>
         )}
+      </div>
+
+      {/* SOP建议卡片 */}
+      <div style={{
+        background: 'var(--bg-card)',
+        borderRadius: '8px',
+        boxShadow: 'var(--shadow-card)',
+        marginBottom: '24px',
+        overflow: 'hidden'
+      }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
+          <h3 style={{ margin: 0 }}>💡 SOP建议方案</h3>
+        </div>
+        <div style={{
+          display: 'flex',
+          gap: '16px',
+          padding: '16px 20px',
+          overflowX: 'auto',
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch',
+        }}>
+          {SOP_CARDS.map((card) => (
+            <div
+              key={card.id}
+              style={{
+                minWidth: '240px',
+                maxWidth: '260px',
+                flexShrink: 0,
+                background: 'var(--bg-secondary)',
+                borderRadius: '12px',
+                padding: '20px',
+                border: '1px solid var(--border-color)',
+              }}
+            >
+              <div style={{ fontSize: '32px', marginBottom: '12px' }}>{card.icon}</div>
+              <h4 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>{card.title}</h4>
+              <p style={{ margin: '0 0 16px 0', color: 'var(--text-secondary)', fontSize: '13px', lineHeight: '1.5' }}>{card.desc}</p>
+              <button
+                onClick={async () => {
+                  setSelectedSopCard(card.title);
+                  await generateSop({ type: card.sopType });
+                  setShowSopSheet(true);
+                }}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#0066cc',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  width: '100%',
+                }}
+              >
+                查看方案
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* 预警详情列表 */}
       <div style={{
-        background: 'white',
+        background: 'var(--bg-card)',
         borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        boxShadow: 'var(--shadow-card)',
         overflow: 'hidden'
       }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid #eee' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
           <h3 style={{ margin: 0 }}>预警详情</h3>
         </div>
         <div style={{ padding: '0 20px' }}>
           {alerts.length === 0 ? (
-            <p style={{ color: '#999', textAlign: 'center', padding: '40px 0' }}>暂无预警</p>
+            <p style={{ color: 'var(--text-tertiary)', textAlign: 'center', padding: '40px 0' }}>暂无预警</p>
           ) : (
             <div style={{ padding: '16px 0' }}>
               {alerts.map((alert) => (
@@ -244,14 +331,14 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: '16px 0',
-                    borderBottom: '1px solid #eee'
+                    borderBottom: '1px solid var(--border-color)'
                   }}
                 >
                   <div>
                     <p style={{ fontSize: '16px', marginBottom: '4px' }}>{alert.forecastDate}</p>
-                    <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>{alert.alertMessage}</p>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0 }}>{alert.alertMessage}</p>
                   </div>
-                  <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#cc0000', margin: 0 }}>
+                  <p className="data-font" style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--semantic-red)', margin: 0 }}>
                     ¥{Number(alert.predictedBalance).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
                   </p>
                 </div>
@@ -260,6 +347,38 @@ export default function BusinessCashFlow({ navigateTo }: BusinessCashFlowProps) 
           )}
         </div>
       </div>
+
+      {/* SOP详情 BottomSheet */}
+      <BottomSheet isOpen={showSopSheet} onClose={() => setShowSopSheet(false)}>
+        <h3 style={{ margin: '0 0 16px 0' }}>{selectedSopCard} - SOP方案</h3>
+        {sops.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {sops.slice(0, 1).map((sop) => (
+              <div key={sop.sopId}>
+                <h4 style={{ margin: '0 0 8px 0', color: '#0066cc' }}>{sop.title}</h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '12px' }}>
+                  创建时间：{new Date(sop.createdAt).toLocaleString('zh-CN')}
+                </p>
+                <div style={{
+                  lineHeight: '1.6',
+                  fontSize: '14px',
+                  color: 'var(--text-primary)',
+                  whiteSpace: 'pre-wrap',
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  padding: '12px',
+                  backgroundColor: 'var(--bg-secondary)',
+                  borderRadius: '8px',
+                }}>
+                  {sop.content}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ color: 'var(--text-tertiary)', textAlign: 'center' }}>正在生成SOP方案...</p>
+        )}
+      </BottomSheet>
     </div>
   );
 }

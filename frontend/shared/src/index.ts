@@ -9,3 +9,4 @@ export * from './store/auth.store';
 export * from './store/asset.store';
 export * from './store/news.store';
 export * from './store/business.store';
+export * from './api/portfolio';

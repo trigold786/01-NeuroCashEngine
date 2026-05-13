@@ -32,15 +32,15 @@ export default function Register() {
       gap: '15px', 
       width: '100%', 
       maxWidth: '400px',
-      background: 'white',
+      background: 'var(--bg-card)',
       padding: '30px',
       borderRadius: '8px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+      boxShadow: 'var(--shadow-card)'
     }}>
       <h2 style={{ marginBottom: '10px' }}>注册</h2>
       
       {error && (
-        <p style={{ color: '#cc0000', fontSize: '14px' }}>{error}</p>
+        <p style={{ color: 'var(--semantic-red)', fontSize: '14px' }}>{error}</p>
       )}
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -51,7 +51,7 @@ export default function Register() {
           value={formData.username}
           onChange={handleChange}
           required
-          style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+          style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
         />
       </div>
       
@@ -64,7 +64,7 @@ export default function Register() {
           value={formData.email}
           onChange={handleChange}
           required
-          style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+          style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
         />
       </div>
       
@@ -77,7 +77,7 @@ export default function Register() {
           value={formData.password}
           onChange={handleChange}
           required
-          style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+          style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
         />
       </div>
       
@@ -88,7 +88,7 @@ export default function Register() {
           name="accountType"
           value={formData.accountType}
           onChange={handleChange}
-          style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+          style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
         >
           <option value={AccountType.INDIVIDUAL}>个人用户</option>
           <option value={AccountType.ENTERPRISE}>企业用户</option>
@@ -104,7 +104,7 @@ export default function Register() {
               name="companyName"
               value={formData.companyName}
               onChange={handleChange}
-              style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+              style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
             />
           </div>
           
@@ -116,7 +116,7 @@ export default function Register() {
               value={formData.industryName}
               onChange={handleChange}
               placeholder="如：零售业、制造业"
-              style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+              style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
             />
           </div>
         </>

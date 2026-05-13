@@ -40,12 +40,12 @@ export default function BusinessSopList({ navigateTo, setCurrentSopId }: Busines
           <button
             onClick={() => navigateTo('dashboard')}
             style={{
-              background: 'white',
-              border: '1px solid #ddd',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
               borderRadius: '4px',
               padding: '8px 16px',
               cursor: 'pointer',
-              color: '#666',
+              color: 'var(--text-secondary)',
               marginBottom: '8px'
             }}
           >
@@ -60,7 +60,7 @@ export default function BusinessSopList({ navigateTo, setCurrentSopId }: Busines
             disabled={loading}
             style={{
               padding: '10px 24px',
-              backgroundColor: '#cc0000',
+              backgroundColor: 'var(--semantic-red)',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
@@ -75,7 +75,7 @@ export default function BusinessSopList({ navigateTo, setCurrentSopId }: Busines
             disabled={loading}
             style={{
               padding: '10px 24px',
-              backgroundColor: '#00cc66',
+              backgroundColor: 'var(--semantic-green)',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
@@ -88,21 +88,21 @@ export default function BusinessSopList({ navigateTo, setCurrentSopId }: Busines
         </div>
       </div>
 
-      {error && <p style={{ color: '#cc0000', textAlign: 'center' }}>{error}</p>}
+      {error && <p style={{ color: 'var(--semantic-red)', textAlign: 'center' }}>{error}</p>}
 
       {/* SOP列表 */}
       <div style={{
-        background: 'white',
+        background: 'var(--bg-card)',
         borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        boxShadow: 'var(--shadow-card)',
         overflow: 'hidden'
       }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid #eee' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
           <h3 style={{ margin: 0 }}>SOP文档列表</h3>
         </div>
         <div style={{ padding: '0 20px' }}>
           {sops.length === 0 ? (
-            <p style={{ color: '#999', textAlign: 'center', padding: '40px 0' }}>
+            <p style={{ color: 'var(--text-tertiary)', textAlign: 'center', padding: '40px 0' }}>
               暂无SOP文档，请点击上方按钮生成
             </p>
           ) : (
@@ -115,7 +115,7 @@ export default function BusinessSopList({ navigateTo, setCurrentSopId }: Busines
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: '16px 0',
-                    borderBottom: '1px solid #eee'
+                    borderBottom: '1px solid var(--border-color)'
                   }}
                 >
                   <div
@@ -123,7 +123,7 @@ export default function BusinessSopList({ navigateTo, setCurrentSopId }: Busines
                     onClick={() => handleViewSop(sop.sopId)}
                   >
                     <p style={{ fontSize: '16px', marginBottom: '4px' }}>{sop.title}</p>
-                    <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0 }}>
                       创建时间：{new Date(sop.createdAt).toLocaleDateString('zh-CN')}
                     </p>
                   </div>
@@ -133,7 +133,7 @@ export default function BusinessSopList({ navigateTo, setCurrentSopId }: Busines
                       onClick={() => handleViewSop(sop.sopId)}
                       style={{
                         padding: '6px 12px',
-                        backgroundColor: '#0066cc',
+                        backgroundColor: 'var(--brand-blue)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
@@ -150,9 +150,9 @@ export default function BusinessSopList({ navigateTo, setCurrentSopId }: Busines
                       }}
                       style={{
                         padding: '6px 12px',
-                        background: '#fff0f0',
-                        color: '#cc0000',
-                        border: '1px solid #ffcccc',
+                        background: 'var(--bg-card)',
+                        color: 'var(--semantic-red)',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '4px',
                         cursor: 'pointer'
                       }}

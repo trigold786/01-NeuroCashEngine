@@ -50,12 +50,12 @@ export default function BusinessSopDetail({ navigateTo, sopId }: BusinessSopDeta
           <button
             onClick={() => navigateTo('business-sops')}
             style={{
-              background: 'white',
-              border: '1px solid #ddd',
+background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
               borderRadius: '4px',
               padding: '8px 16px',
               cursor: 'pointer',
-              color: '#666',
+              color: 'var(--text-secondary)',
               marginBottom: '8px'
             }}
           >
@@ -64,18 +64,18 @@ export default function BusinessSopDetail({ navigateTo, sopId }: BusinessSopDeta
         </div>
       </div>
 
-      {loading && <p style={{ textAlign: 'center', color: '#666' }}>加载中...</p>}
-      {error && <p style={{ color: '#cc0000', textAlign: 'center' }}>{error}</p>}
+      {loading && <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>加载中...</p>}
+      {error && <p style={{ color: 'var(--semantic-red)', textAlign: 'center' }}>{error}</p>}
 
       {currentSop && (
         <div style={{
           background: 'white',
           padding: '32px',
           borderRadius: '8px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+          boxShadow: 'var(--shadow-card)'
         }}>
           <h1 style={{ marginTop: 0, marginBottom: '8px' }}>{currentSop.title}</h1>
-          <p style={{ color: '#666', marginBottom: '24px' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
             创建时间：{new Date(currentSop.createdAt).toLocaleString('zh-CN')}
           </p>
 
@@ -83,7 +83,7 @@ export default function BusinessSopDetail({ navigateTo, sopId }: BusinessSopDeta
             {renderMarkdown(currentSop.content)}
           </div>
 
-          <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #eee' }}>
+          <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid var(--border-color)' }}>
             <button
               style={{
                 padding: '10px 24px',
@@ -113,9 +113,9 @@ export default function BusinessSopDetail({ navigateTo, sopId }: BusinessSopDeta
             <button
               style={{
                 padding: '10px 24px',
-                backgroundColor: '#f5f5f5',
-                color: '#333',
-                border: '1px solid #ddd',
+                backgroundColor: 'var(--bg-secondary)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-color)',
                 borderRadius: '4px',
                 cursor: 'pointer'
               }}

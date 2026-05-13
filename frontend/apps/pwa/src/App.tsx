@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuthStore } from '@nce/shared';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -11,15 +11,25 @@ import BusinessSopList from './pages/BusinessSopList';
 import BusinessSopDetail from './pages/BusinessSopDetail';
 import Strategy from './pages/Strategy';
 import EnterpriseStrategy from './pages/EnterpriseStrategy';
+import PortfolioMonitoring from './pages/PortfolioMonitoring';
 import PointsCenter from './pages/PointsCenter';
 
-export type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail' | 'business-cashflow' | 'business-sops' | 'business-sop-detail' | 'strategy' | 'enterprise-strategy' | 'points';
+export type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail' | 'business-cashflow' | 'business-sops' | 'business-sop-detail' | 'strategy' | 'enterprise-strategy' | 'portfolio-monitoring' | 'points';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [currentPage, setCurrentPage] = React.useState<Page>(isAuthenticated ? 'dashboard' : 'login');
   const [currentNewsId, setCurrentNewsId] = React.useState<string | null>(null);
   const [currentSopId, setCurrentSopId] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  }, []);
 
   React.useEffect(() => {
     if (isAuthenticated && (currentPage === 'login' || currentPage === 'register')) {
@@ -38,7 +48,7 @@ function App() {
       case 'register':
         return <Register />;
       case 'dashboard':
-        return <Dashboard navigateTo={setCurrentPage} />;
+        return <Dashboard navigateTo={setCurrentPage} setCurrentNewsId={setCurrentNewsId} />;
       case 'assets':
         return <AssetOverview navigateTo={setCurrentPage} />;
       case 'news':
@@ -63,10 +73,12 @@ function App() {
         return <Strategy navigateTo={setCurrentPage} />;
       case 'enterprise-strategy':
         return <EnterpriseStrategy navigateTo={setCurrentPage} />;
+      case 'portfolio-monitoring':
+        return <PortfolioMonitoring navigateTo={setCurrentPage} />;
       case 'points':
         return <PointsCenter navigateTo={setCurrentPage} />;
       default:
-        return <Dashboard navigateTo={setCurrentPage} />;
+        return <Dashboard navigateTo={setCurrentPage} setCurrentNewsId={setCurrentNewsId} />;
     }
   };
 
@@ -78,9 +90,11 @@ function App() {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        padding: '20px'
+        padding: '20px',
+        background: 'var(--bg-primary)',
+        color: 'var(--text-primary)'
       }}>
-        <h1 style={{ marginBottom: '20px' }}>NeuroCashEngine</h1>
+        <h1 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>NeuroCashEngine</h1>
         {currentPage === 'login' ? (
           <>
             <Login />
@@ -88,7 +102,7 @@ function App() {
               没有账号？
               <button
                 onClick={() => setCurrentPage('register')}
-                style={{ marginLeft: '10px', border: 'none', background: 'none', color: '#0066cc', cursor: 'pointer' }}
+                style={{ marginLeft: '10px', border: 'none', background: 'none', color: 'var(--brand-blue)', cursor: 'pointer' }}
               >
                 立即注册
               </button>
@@ -101,7 +115,7 @@ function App() {
               已有账号？
               <button
                 onClick={() => setCurrentPage('login')}
-                style={{ marginLeft: '10px', border: 'none', background: 'none', color: '#0066cc', cursor: 'pointer' }}
+                style={{ marginLeft: '10px', border: 'none', background: 'none', color: 'var(--brand-blue)', cursor: 'pointer' }}
               >
                 立即登录
               </button>
@@ -113,7 +127,8 @@ function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f5f7fa' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+      <ThemeToggle />
       {renderPage()}
     </div>
   );
