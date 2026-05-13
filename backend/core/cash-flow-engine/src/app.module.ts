@@ -8,17 +8,22 @@ import { SopTemplate } from './entities/SopTemplate.entity';
 import { GeneratedSop } from './entities/GeneratedSop.entity';
 import { IndustryClassification } from './entities/IndustryClassification.entity';
 import { CashFlowEvent } from './entities/CashFlowEvent.entity';
+import { Points } from './entities/Points.entity';
+import { PointsRecord } from './entities/PointsRecord.entity';
+import { ReferralCode } from './entities/ReferralCode.entity';
 import { AssetService } from './services/AssetService';
 import { CashFlowService } from './services/CashFlowService';
 import { BusinessCashFlowService } from './services/BusinessCashFlowService';
 import { SopExportService } from './services/SopExportService';
 import { StrategyService } from './services/StrategyService';
 import { EnterpriseStrategyService } from './services/EnterpriseStrategyService';
+import { PointsService } from './services/PointsService';
 import { AssetController } from './controllers/AssetController';
 import { CashFlowController } from './controllers/CashFlowController';
 import { BusinessCashFlowController } from './controllers/BusinessCashFlowController';
 import { StrategyController } from './controllers/StrategyController';
 import { EnterpriseStrategyController } from './controllers/EnterpriseStrategyController';
+import { PointsController } from './controllers/PointsController';
 
 @Module({
   imports: [
@@ -32,14 +37,15 @@ import { EnterpriseStrategyController } from './controllers/EnterpriseStrategyCo
       database: process.env.DB_NAME || 'nce_db',
       entities: [
         UserAssetAccount, CashFlowRecord, CashFlowForecast, 
-        SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent
+        SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent,
+        Points, PointsRecord, ReferralCode
       ],
       synchronize: true,
       logging: process.env.NODE_ENV !== 'production',
     }),
-    TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent]),
+    TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent, Points, PointsRecord, ReferralCode]),
   ],
-  providers: [AssetService, CashFlowService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService],
-  controllers: [AssetController, CashFlowController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController],
+  providers: [AssetService, CashFlowService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService, PointsService],
+  controllers: [AssetController, CashFlowController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController, PointsController],
 })
 export class AppModule {}

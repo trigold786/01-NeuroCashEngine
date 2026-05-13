@@ -6,6 +6,9 @@ export enum AssetCategory {
   FUND = 'FUND',
   STOCK = 'STOCK',
   BOND = 'BOND',
+  GOLD = 'GOLD',
+  FUTURES = 'FUTURES',
+  REITS = 'REITS',
 }
 
 @Entity('nce_investment_sentiment')

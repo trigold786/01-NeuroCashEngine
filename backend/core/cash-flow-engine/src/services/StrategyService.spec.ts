@@ -72,21 +72,21 @@ describe('StrategyService', () => {
     it('should return conservative allocation for conservative risk profile', () => {
       const result = service.generateRecommendation('conservative');
       expect(result.riskProfile).toBe('conservative');
-      expect(result.allocation).toEqual({ CASH: 20, DEPOSIT: 50, FUND: 20, STOCK: 10 });
+      expect(result.allocation).toEqual({ CASH: 20, DEPOSIT: 50, FUND: 20, STOCK: 10, BOND: 0, GOLD: 0, FUTURES: 0, REITS: 0 });
       expect(result.riskLevel).toBe(1);
     });
 
     it('should return moderate allocation for moderate risk profile', () => {
       const result = service.generateRecommendation('moderate');
       expect(result.riskProfile).toBe('moderate');
-      expect(result.allocation).toEqual({ CASH: 10, DEPOSIT: 30, FUND: 40, STOCK: 20 });
+      expect(result.allocation).toEqual({ CASH: 10, DEPOSIT: 30, FUND: 40, STOCK: 20, BOND: 0, GOLD: 0, FUTURES: 0, REITS: 0 });
       expect(result.riskLevel).toBe(2);
     });
 
     it('should return aggressive allocation for aggressive risk profile', () => {
       const result = service.generateRecommendation('aggressive');
       expect(result.riskProfile).toBe('aggressive');
-      expect(result.allocation).toEqual({ CASH: 5, DEPOSIT: 15, FUND: 30, STOCK: 50 });
+      expect(result.allocation).toEqual({ CASH: 5, DEPOSIT: 15, FUND: 30, STOCK: 50, BOND: 0, GOLD: 0, FUTURES: 0, REITS: 0 });
       expect(result.riskLevel).toBe(3);
     });
 
@@ -132,6 +132,89 @@ describe('StrategyService', () => {
         expect(product).toHaveProperty('riskLevel');
         expect(product).toHaveProperty('description');
       });
+    });
+  });
+
+  describe('getStrategyByRiskProfile', () => {
+    it('should return investment strategy for conservative', () => {
+      const result = service.getStrategyByRiskProfile('conservative');
+      expect(result).toHaveProperty('entryTiming');
+      expect(result).toHaveProperty('holdingPeriod');
+      expect(result).toHaveProperty('stopProfitLevel');
+      expect(result).toHaveProperty('stopLossLevel');
+      expect(result).toHaveProperty('riskMgmtAdvice');
+      expect(result).toHaveProperty('capitalMgmtAdvice');
+      expect(result.holdingPeriod).toContain('12-24');
+    });
+
+    it('should return investment strategy for moderate', () => {
+      const result = service.getStrategyByRiskProfile('moderate');
+      expect(result.holdingPeriod).toContain('6-12');
+    });
+
+    it('should return investment strategy for aggressive', () => {
+      const result = service.getStrategyByRiskProfile('aggressive');
+      expect(result.holdingPeriod).toContain('3-6');
+    });
+
+    it('should default to conservative for unknown profile', () => {
+      const result = service.getStrategyByRiskProfile('unknown' as any);
+      expect(result.holdingPeriod).toContain('12-24');
+    });
+  });
+
+  describe('getTradingPlan', () => {
+    it('should return trading plan for conservative', () => {
+      const result = service.getTradingPlan('conservative', 100000);
+      expect(result.length).toBe(3);
+      expect(result[0]).toContain('第1批');
+    });
+
+    it('should return trading plan for aggressive', () => {
+      const result = service.getTradingPlan('aggressive', 200000);
+      expect(result.length).toBe(5);
+    });
+
+    it('should include amount in trading plan steps', () => {
+      const result = service.getTradingPlan('moderate', 50000);
+      expect(result[0]).toContain('20000');
+    });
+
+    it('should default to conservative for unknown profile', () => {
+      const result = service.getTradingPlan('unknown' as any, 100000);
+      expect(result.length).toBe(3);
+    });
+  });
+
+  describe('getFundamentalAnalysis', () => {
+    it('should return fundamental data for known product', () => {
+      const result = service.getFundamentalAnalysis('P-MOD-001');
+      expect(result).toHaveProperty('pe');
+      expect(result).toHaveProperty('pb');
+      expect(result).toHaveProperty('roe');
+      expect(result).toHaveProperty('revenueGrowth');
+      expect(result.pe).toBe(15);
+    });
+
+    it('should return default data for unknown product', () => {
+      const result = service.getFundamentalAnalysis('UNKNOWN');
+      expect(result.pe).toBe(10);
+    });
+  });
+
+  describe('getTechnicalAnalysis', () => {
+    it('should return technical data for known stock', () => {
+      const result = service.getTechnicalAnalysis('600519');
+      expect(result).toHaveProperty('trend');
+      expect(result).toHaveProperty('support');
+      expect(result).toHaveProperty('resistance');
+      expect(result).toHaveProperty('rsi');
+      expect(result.support).toBe(1600);
+    });
+
+    it('should return default data for unknown stock', () => {
+      const result = service.getTechnicalAnalysis('UNKNOWN');
+      expect(result.rsi).toBe(50);
     });
   });
 });

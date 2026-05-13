@@ -10,6 +10,10 @@ import { CashFlowVelocityService } from './services/CashFlowVelocityService';
 import { CashFlowVelocityController } from './controllers/CashFlowVelocityController';
 import { ProductPreferenceService } from './services/ProductPreferenceService';
 import { ProductPreferenceController } from './controllers/ProductPreferenceController';
+import { RegionalConsumptionService } from './services/RegionalConsumptionService';
+import { RegionalConsumptionController } from './controllers/RegionalConsumptionController';
+import { NSICrossDataService } from './services/NSICrossDataService';
+import { NSICrossDataController } from './controllers/NSICrossDataController';
 
 @Module({
   imports: [
@@ -27,7 +31,7 @@ import { ProductPreferenceController } from './controllers/ProductPreferenceCont
     }),
     TypeOrmModule.forFeature([InvestmentSentiment]),
   ],
-  providers: [DataProductService, SentimentService, CashFlowVelocityService, ProductPreferenceService],
-  controllers: [DataProductController, SentimentController, CashFlowVelocityController, ProductPreferenceController],
+  providers: [DataProductService, SentimentService, CashFlowVelocityService, ProductPreferenceService, RegionalConsumptionService, NSICrossDataService],
+  controllers: [DataProductController, SentimentController, CashFlowVelocityController, ProductPreferenceController, RegionalConsumptionController, NSICrossDataController],
 })
 export class AppModule {}

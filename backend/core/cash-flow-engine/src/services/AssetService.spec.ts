@@ -79,6 +79,22 @@ describe('AssetService', () => {
     it('should default to CASH for unknown types', () => {
       expect(service.convertAccountType('UNKNOWN')).toBe(AccountType.CASH);
     });
+
+    it('should convert BOND string to AccountType.BOND', () => {
+      expect(service.convertAccountType('BOND')).toBe(AccountType.BOND);
+    });
+
+    it('should convert GOLD string to AccountType.GOLD', () => {
+      expect(service.convertAccountType('GOLD')).toBe(AccountType.GOLD);
+    });
+
+    it('should convert FUTURES string to AccountType.FUTURES', () => {
+      expect(service.convertAccountType('FUTURES')).toBe(AccountType.FUTURES);
+    });
+
+    it('should convert REITS string to AccountType.REITS', () => {
+      expect(service.convertAccountType('REITS')).toBe(AccountType.REITS);
+    });
   });
 
   describe('formatAccount', () => {
@@ -237,9 +253,140 @@ describe('AssetService', () => {
       expect(result.stockCode).toBe('600519');
       expect(result.stockName).toBe('贵州茅台');
       expect(result.shareCount).toBe(100);
-      expect(result.currentPrice).toBe(1800);
+        expect(result.currentPrice).toBe(1800);
+      });
     });
-  });
+
+    it('should create BOND account with bond details', async () => {
+      const userId = 'user-1';
+      const dto = {
+        accountName: '我的债券',
+        accountType: 'BOND',
+        balance: 50000,
+        bondCode: '019663',
+        bondName: '21国债07',
+        bondType: '国债',
+        maturityDate: '2026-06-30',
+        couponRate: 3.5,
+      };
+
+      mockAccountRepository.create.mockReturnValue({ ...dto, userId });
+      mockAccountRepository.save.mockResolvedValue({
+        accountId: 'acc-bond',
+        userId,
+        accountName: '我的债券',
+        accountType: AccountType.BOND,
+        encryptedBalance: 'encrypted',
+        bondCode: '019663',
+        bondName: '21国债07',
+        bondType: '国债',
+        maturityDate: new Date('2026-06-30'),
+        couponRate: 3.5,
+      });
+
+      const result = await service.createAccount(userId, dto);
+
+      expect(mockAccountRepository.save).toHaveBeenCalled();
+      expect(result).toBeDefined();
+      expect(result.bondCode).toBe('019663');
+      expect(result.bondName).toBe('21国债07');
+      expect(result.couponRate).toBe(3.5);
+    });
+
+    it('should create GOLD account with gold details', async () => {
+      const userId = 'user-1';
+      const dto = {
+        accountName: '我的黄金',
+        accountType: 'GOLD',
+        balance: 50000,
+        goldType: '黄金ETF',
+        holdWeight: 100,
+      };
+
+      mockAccountRepository.create.mockReturnValue({ ...dto, userId });
+      mockAccountRepository.save.mockResolvedValue({
+        accountId: 'acc-gold',
+        userId,
+        accountName: '我的黄金',
+        accountType: AccountType.GOLD,
+        encryptedBalance: 'encrypted',
+        goldType: '黄金ETF',
+        holdWeight: 100,
+      });
+
+      const result = await service.createAccount(userId, dto);
+
+      expect(mockAccountRepository.save).toHaveBeenCalled();
+      expect(result).toBeDefined();
+      expect(result.goldType).toBe('黄金ETF');
+      expect(result.holdWeight).toBe(100);
+    });
+
+    it('should create FUTURES account with futures details', async () => {
+      const userId = 'user-1';
+      const dto = {
+        accountName: '我的期货',
+        accountType: 'FUTURES',
+        balance: 100000,
+        futuresCode: 'IF2406',
+        futuresName: '沪深300股指期货',
+        margin: 30000,
+        contractUnit: 300,
+      };
+
+      mockAccountRepository.create.mockReturnValue({ ...dto, userId });
+      mockAccountRepository.save.mockResolvedValue({
+        accountId: 'acc-futures',
+        userId,
+        accountName: '我的期货',
+        accountType: AccountType.FUTURES,
+        encryptedBalance: 'encrypted',
+        futuresCode: 'IF2406',
+        futuresName: '沪深300股指期货',
+        margin: 30000,
+        contractUnit: 300,
+      });
+
+      const result = await service.createAccount(userId, dto);
+
+      expect(mockAccountRepository.save).toHaveBeenCalled();
+      expect(result).toBeDefined();
+      expect(result.futuresCode).toBe('IF2406');
+      expect(result.futuresName).toBe('沪深300股指期货');
+      expect(result.margin).toBe(30000);
+    });
+
+    it('should create REITS account with reits details', async () => {
+      const userId = 'user-1';
+      const dto = {
+        accountName: '我的REITS',
+        accountType: 'REITS',
+        balance: 30000,
+        reitsCode: '508056',
+        reitsName: '中金普洛斯REIT',
+        dividendYield: 4.5,
+      };
+
+      mockAccountRepository.create.mockReturnValue({ ...dto, userId });
+      mockAccountRepository.save.mockResolvedValue({
+        accountId: 'acc-reits',
+        userId,
+        accountName: '我的REITS',
+        accountType: AccountType.REITS,
+        encryptedBalance: 'encrypted',
+        reitsCode: '508056',
+        reitsName: '中金普洛斯REIT',
+        dividendYield: 4.5,
+      });
+
+      const result = await service.createAccount(userId, dto);
+
+      expect(mockAccountRepository.save).toHaveBeenCalled();
+      expect(result).toBeDefined();
+      expect(result.reitsCode).toBe('508056');
+      expect(result.reitsName).toBe('中金普洛斯REIT');
+      expect(result.dividendYield).toBe(4.5);
+    });
 
   describe('getAccounts', () => {
     it('should return formatted accounts for user', async () => {

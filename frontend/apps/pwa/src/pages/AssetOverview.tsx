@@ -44,6 +44,20 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
     stockCode: '',
     stockName: '',
     currentPrice: undefined as number | undefined,
+    bondCode: '',
+    bondName: '',
+    bondType: '',
+    maturityDate: '',
+    couponRate: undefined as number | undefined,
+    goldType: '',
+    holdWeight: undefined as number | undefined,
+    futuresCode: '',
+    futuresName: '',
+    margin: undefined as number | undefined,
+    contractUnit: undefined as number | undefined,
+    reitsCode: '',
+    reitsName: '',
+    dividendYield: undefined as number | undefined,
   });
 
   useEffect(() => {
@@ -73,6 +87,20 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
       stockCode: '',
       stockName: '',
       currentPrice: undefined,
+    bondCode: '',
+    bondName: '',
+    bondType: '',
+    maturityDate: '',
+    couponRate: undefined,
+    goldType: '',
+    holdWeight: undefined,
+    futuresCode: '',
+    futuresName: '',
+    margin: undefined,
+    contractUnit: undefined,
+    reitsCode: '',
+    reitsName: '',
+    dividendYield: undefined,
     });
   };
 
@@ -300,6 +328,26 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
                         {acc.stockCode} {acc.stockName} | 持仓{acc.shareCount}股 | 现价{acc.currentPrice}
                       </p>
                     )}
+                    {acc.accountType === 'BOND' && acc.bondCode && (
+                      <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#999' }}>
+                        {acc.bondCode} {acc.bondName} | {acc.bondType} | {acc.couponRate}% | 到期{acc.maturityDate?.split('T')[0]}
+                      </p>
+                    )}
+                    {acc.accountType === 'GOLD' && acc.goldType && (
+                      <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#999' }}>
+                        {acc.goldType} | 持有{acc.holdWeight}g
+                      </p>
+                    )}
+                    {acc.accountType === 'FUTURES' && acc.futuresCode && (
+                      <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#999' }}>
+                        {acc.futuresCode} {acc.futuresName} | 保证金{acc.margin} | 合约单位{acc.contractUnit}
+                      </p>
+                    )}
+                    {acc.accountType === 'REITS' && acc.reitsCode && (
+                      <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#999' }}>
+                        {acc.reitsCode} {acc.reitsName} | 分红收益率{acc.dividendYield}%
+                      </p>
+                    )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#00cc66', margin: 0 }}>
@@ -365,6 +413,10 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
                   <option value="DEPOSIT">存款</option>
                   <option value="FUND">基金</option>
                   <option value="STOCK">股票</option>
+                  <option value="BOND">债券</option>
+                  <option value="GOLD">贵金属</option>
+                  <option value="FUTURES">期货</option>
+                  <option value="REITS">REITS</option>
                 </select>
               </div>
 
@@ -502,6 +554,173 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
                       step="0.0001"
                       value={newAccount.nav || ''}
                       onChange={(e) => setNewAccount({ ...newAccount, nav: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {newAccount.accountType === 'BOND' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>债券代码</label>
+                    <input
+                      type="text"
+                      value={newAccount.bondCode}
+                      onChange={(e) => setNewAccount({ ...newAccount, bondCode: e.target.value })}
+                      placeholder="例如：019663"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>债券名称</label>
+                    <input
+                      type="text"
+                      value={newAccount.bondName}
+                      onChange={(e) => setNewAccount({ ...newAccount, bondName: e.target.value })}
+                      placeholder="例如：21国债07"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>债券类型</label>
+                    <select
+                      value={newAccount.bondType}
+                      onChange={(e) => setNewAccount({ ...newAccount, bondType: e.target.value })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    >
+                      <option value="">请选择</option>
+                      <option value="国债">国债</option>
+                      <option value="企业债">企业债</option>
+                      <option value="可转债">可转债</option>
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>到期日</label>
+                    <input
+                      type="date"
+                      value={newAccount.maturityDate}
+                      onChange={(e) => setNewAccount({ ...newAccount, maturityDate: e.target.value })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>票面利率 (%)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newAccount.couponRate || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, couponRate: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {newAccount.accountType === 'GOLD' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>黄金类型</label>
+                    <select
+                      value={newAccount.goldType}
+                      onChange={(e) => setNewAccount({ ...newAccount, goldType: e.target.value })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    >
+                      <option value="">请选择</option>
+                      <option value="黄金ETF">黄金ETF</option>
+                      <option value="实物金">实物金</option>
+                      <option value="纸黄金">纸黄金</option>
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>持有重量 (克)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newAccount.holdWeight || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, holdWeight: parseFloat(e.target.value) || undefined })}
+                      placeholder="例如：100"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {newAccount.accountType === 'FUTURES' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>期货代码</label>
+                    <input
+                      type="text"
+                      value={newAccount.futuresCode}
+                      onChange={(e) => setNewAccount({ ...newAccount, futuresCode: e.target.value })}
+                      placeholder="例如：IF2406"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>期货名称</label>
+                    <input
+                      type="text"
+                      value={newAccount.futuresName}
+                      onChange={(e) => setNewAccount({ ...newAccount, futuresName: e.target.value })}
+                      placeholder="例如：沪深300股指期货"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>保证金</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newAccount.margin || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, margin: parseFloat(e.target.value) || undefined })}
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>合约单位</label>
+                    <input
+                      type="number"
+                      step="1"
+                      value={newAccount.contractUnit || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, contractUnit: parseFloat(e.target.value) || undefined })}
+                      placeholder="例如：300"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {newAccount.accountType === 'REITS' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>REITS代码</label>
+                    <input
+                      type="text"
+                      value={newAccount.reitsCode}
+                      onChange={(e) => setNewAccount({ ...newAccount, reitsCode: e.target.value })}
+                      placeholder="例如：508056"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>REITS名称</label>
+                    <input
+                      type="text"
+                      value={newAccount.reitsName}
+                      onChange={(e) => setNewAccount({ ...newAccount, reitsName: e.target.value })}
+                      placeholder="例如：中金普洛斯REIT"
+                      style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label>分红收益率 (%)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newAccount.dividendYield || ''}
+                      onChange={(e) => setNewAccount({ ...newAccount, dividendYield: parseFloat(e.target.value) || undefined })}
                       style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
                     />
                   </div>

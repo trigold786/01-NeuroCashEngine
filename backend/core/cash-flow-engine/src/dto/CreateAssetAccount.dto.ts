@@ -82,4 +82,69 @@ export class CreateAssetAccountDto {
   @IsNumber()
   @Type(() => Number)
   currentPrice?: number;
+
+  // BOND fields
+  @IsOptional()
+  @IsString()
+  bondCode?: string;
+
+  @IsOptional()
+  @IsString()
+  bondName?: string;
+
+  @IsOptional()
+  @IsString()
+  bondType?: string;
+
+  @IsOptional()
+  @IsDateString()
+  maturityDate?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  couponRate?: number;
+
+  // GOLD fields
+  @IsOptional()
+  @IsString()
+  goldType?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  holdWeight?: number;
+
+  // FUTURES fields
+  @IsOptional()
+  @IsString()
+  futuresCode?: string;
+
+  @IsOptional()
+  @IsString()
+  futuresName?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  margin?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  contractUnit?: number;
+
+  // REITS fields
+  @IsOptional()
+  @IsString()
+  reitsCode?: string;
+
+  @IsOptional()
+  @IsString()
+  reitsName?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  dividendYield?: number;
 }

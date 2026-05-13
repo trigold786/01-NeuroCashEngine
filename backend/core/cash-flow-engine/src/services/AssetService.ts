@@ -23,6 +23,10 @@ export class AssetService {
       'DEPOSIT': AccountType.DEPOSIT,
       'FUND': AccountType.FUND,
       'STOCK': AccountType.STOCK,
+      'BOND': AccountType.BOND,
+      'GOLD': AccountType.GOLD,
+      'FUTURES': AccountType.FUTURES,
+      'REITS': AccountType.REITS,
     };
     return map[type] ?? AccountType.CASH;
   }
@@ -35,6 +39,10 @@ export class AssetService {
       [AccountType.DEPOSIT]: '存款',
       [AccountType.FUND]: '基金',
       [AccountType.STOCK]: '股票',
+      [AccountType.BOND]: '债券',
+      [AccountType.GOLD]: '贵金属',
+      [AccountType.FUTURES]: '期货',
+      [AccountType.REITS]: 'REITS',
     };
     
     let balance = 0;
@@ -66,6 +74,20 @@ export class AssetService {
       stockCode: account.stockCode,
       stockName: account.stockName,
       currentPrice: account.currentPrice,
+      bondCode: account.bondCode,
+      bondName: account.bondName,
+      bondType: account.bondType,
+      maturityDate: account.maturityDate,
+      couponRate: account.couponRate,
+      goldType: account.goldType,
+      holdWeight: account.holdWeight,
+      futuresCode: account.futuresCode,
+      futuresName: account.futuresName,
+      margin: account.margin,
+      contractUnit: account.contractUnit,
+      reitsCode: account.reitsCode,
+      reitsName: account.reitsName,
+      dividendYield: account.dividendYield,
     };
   }
 
@@ -109,6 +131,32 @@ export class AssetService {
       account.currentPrice = dto.currentPrice;
     }
 
+    if (accountType === AccountType.BOND) {
+      account.bondCode = dto.bondCode;
+      account.bondName = dto.bondName;
+      account.bondType = dto.bondType;
+      account.maturityDate = dto.maturityDate ? new Date(dto.maturityDate) : undefined;
+      account.couponRate = dto.couponRate;
+    }
+
+    if (accountType === AccountType.GOLD) {
+      account.goldType = dto.goldType;
+      account.holdWeight = dto.holdWeight;
+    }
+
+    if (accountType === AccountType.FUTURES) {
+      account.futuresCode = dto.futuresCode;
+      account.futuresName = dto.futuresName;
+      account.margin = dto.margin;
+      account.contractUnit = dto.contractUnit;
+    }
+
+    if (accountType === AccountType.REITS) {
+      account.reitsCode = dto.reitsCode;
+      account.reitsName = dto.reitsName;
+      account.dividendYield = dto.dividendYield;
+    }
+
     this.logger.log(`Account entity before save: ${JSON.stringify(account)}`);
     try {
       const saved = await this.accountRepository.save(account);
@@ -140,6 +188,10 @@ export class AssetService {
       '存款': 0,
       '基金': 0,
       '股票': 0,
+      '债券': 0,
+      '贵金属': 0,
+      '期货': 0,
+      'REITS': 0,
     };
 
     let total = 0;

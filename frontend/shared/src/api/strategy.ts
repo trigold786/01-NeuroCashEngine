@@ -2,7 +2,7 @@ import { cashflowApiClient } from './client';
 
 export interface Recommendation {
   riskProfile: string;
-  allocation: { CASH: number; DEPOSIT: number; FUND: number; STOCK: number };
+  allocation: { CASH: number; DEPOSIT: number; FUND: number; STOCK: number; BOND: number; GOLD: number; FUTURES: number; REITS: number };
   riskLevel: number;
 }
 
@@ -13,6 +13,29 @@ export interface Product {
   expectedReturn: number;
   riskLevel: number;
   description: string;
+}
+
+export interface InvestmentStrategy {
+  entryTiming: string;
+  holdingPeriod: string;
+  stopProfitLevel: string;
+  stopLossLevel: string;
+  riskMgmtAdvice: string;
+  capitalMgmtAdvice: string;
+}
+
+export interface FundamentalAnalysis {
+  pe: number;
+  pb: number;
+  roe: number;
+  revenueGrowth: number;
+}
+
+export interface TechnicalAnalysis {
+  trend: string;
+  support: number;
+  resistance: number;
+  rsi: number;
 }
 
 export interface EnterpriseQuestionnaire {
@@ -84,5 +107,21 @@ export const strategyApi = {
 
   async enterpriseGetTemplates(): Promise<EnterpriseStrategyTemplate[]> {
     return await cashflowApiClient.get('/enterprise/strategy/templates');
+  },
+
+  async getStrategy(riskProfile: string): Promise<InvestmentStrategy> {
+    return await cashflowApiClient.get('/strategy/strategy', { params: { riskProfile } });
+  },
+
+  async getTradingPlan(riskProfile: string, amount: number): Promise<string[]> {
+    return await cashflowApiClient.post('/strategy/trading-plan', { riskProfile, amount });
+  },
+
+  async getFundamentalAnalysis(productId: string): Promise<FundamentalAnalysis> {
+    return await cashflowApiClient.get('/strategy/analysis/fundamental', { params: { productId } });
+  },
+
+  async getTechnicalAnalysis(stockCode: string): Promise<TechnicalAnalysis> {
+    return await cashflowApiClient.get('/strategy/analysis/technical', { params: { stockCode } });
   },
 };

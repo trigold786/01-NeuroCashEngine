@@ -13,7 +13,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Page } from '../App';
-import { strategyApi, Product, Recommendation } from '@nce/shared/src/api/strategy';
+import { strategyApi, Product, Recommendation, InvestmentStrategy, FundamentalAnalysis, TechnicalAnalysis } from '@nce/shared/src/api/strategy';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, RadialLinearScale, PointElement, RadarElement, Title, Tooltip, Legend);
 
@@ -84,6 +84,12 @@ export default function Strategy({ navigateTo }: StrategyProps) {
   const [error, setError] = useState<string | null>(null);
   const [expectedReturn, setExpectedReturn] = useState(10);
   const [maxDrawdown, setMaxDrawdown] = useState(15);
+  const [strategy, setStrategy] = useState<InvestmentStrategy | null>(null);
+  const [tradingPlan, setTradingPlan] = useState<string[]>([]);
+  const [analysisTab, setAnalysisTab] = useState<'fundamental' | 'technical'>('fundamental');
+  const [fundamentalData, setFundamentalData] = useState<FundamentalAnalysis | null>(null);
+  const [technicalData, setTechnicalData] = useState<TechnicalAnalysis | null>(null);
+  const [amount, setAmount] = useState(100000);
 
   const handleAnswerChange = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -103,6 +109,28 @@ export default function Strategy({ navigateTo }: StrategyProps) {
       const productsData = await strategyApi.getProductsByRiskLevel(riskResult.riskProfile);
       setProducts(productsData);
       setCurrentStep(2);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err.message || 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewStrategy = async () => {
+    if (!recommendation) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const s = await strategyApi.getStrategy(recommendation.riskProfile);
+      setStrategy(s);
+      const plan = await strategyApi.getTradingPlan(recommendation.riskProfile, amount);
+      setTradingPlan(plan);
+      const prodId = products[0]?.id || 'P-MOD-001';
+      const fd = await strategyApi.getFundamentalAnalysis(prodId);
+      setFundamentalData(fd);
+      const td = await strategyApi.getTechnicalAnalysis('600519');
+      setTechnicalData(td);
+      setCurrentStep(4);
     } catch (err: any) {
       setError(err?.response?.data?.message || err.message || 'An error occurred');
     } finally {
@@ -523,6 +551,231 @@ export default function Strategy({ navigateTo }: StrategyProps) {
           ← 返回配置方案
         </button>
         <button
+          onClick={handleViewStrategy}
+          style={{
+            padding: '12px 32px',
+            borderRadius: '4px',
+            border: 'none',
+            background: '#0066cc',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: '16px',
+          }}
+        >
+          查看投资策略 →
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderStep4 = () => (
+    <div>
+      <div style={{
+        background: 'white',
+        padding: '24px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        marginBottom: '24px',
+      }}>
+        <h2 style={{ marginTop: 0, marginBottom: '16px' }}>投资策略详情</h2>
+        <p style={{ color: '#666', marginBottom: 0 }}>
+          基于您的风险偏好，以下是详细的投资策略建议。
+        </p>
+      </div>
+
+      {strategy && (
+        <div style={{
+          background: 'white',
+          padding: '24px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          marginBottom: '24px',
+        }}>
+          <h3 style={{ marginTop: 0, marginBottom: '16px' }}>策略要点</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#999' }}>建仓时机</p>
+              <p style={{ margin: 0, fontWeight: '500' }}>{strategy.entryTiming}</p>
+            </div>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#999' }}>持有周期</p>
+              <p style={{ margin: 0, fontWeight: '500' }}>{strategy.holdingPeriod}</p>
+            </div>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#999' }}>止盈策略</p>
+              <p style={{ margin: 0, fontWeight: '500' }}>{strategy.stopProfitLevel}</p>
+            </div>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#999' }}>止损策略</p>
+              <p style={{ margin: 0, fontWeight: '500' }}>{strategy.stopLossLevel}</p>
+            </div>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#999' }}>风险管理</p>
+              <p style={{ margin: 0, fontWeight: '500' }}>{strategy.riskMgmtAdvice}</p>
+            </div>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#999' }}>资金管理</p>
+              <p style={{ margin: 0, fontWeight: '500' }}>{strategy.capitalMgmtAdvice}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{
+        background: 'white',
+        padding: '24px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        marginBottom: '24px',
+      }}>
+        <h3 style={{ marginTop: 0, marginBottom: '16px' }}>交易方案</h3>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span>投资金额</span>
+            <span style={{ fontWeight: 'bold', color: '#0066cc' }}>¥{amount.toLocaleString()}</span>
+          </label>
+          <input
+            type="range"
+            min="10000"
+            max="1000000"
+            step="10000"
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
+            style={{ width: '100%' }}
+          />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {tradingPlan.map((step, index) => (
+            <div key={index} style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '12px',
+              padding: '12px',
+              backgroundColor: '#f9f9f9',
+              borderRadius: '8px',
+            }}>
+              <div style={{
+                minWidth: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                backgroundColor: '#0066cc',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '14px',
+                fontWeight: 'bold',
+              }}>
+                {index + 1}
+              </div>
+              <p style={{ margin: '4px 0 0 0' }}>{step}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{
+        background: 'white',
+        padding: '24px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        marginBottom: '24px',
+      }}>
+        <h3 style={{ marginTop: 0, marginBottom: '16px' }}>智能分析</h3>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+          <button
+            onClick={() => setAnalysisTab('fundamental')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '4px',
+              border: analysisTab === 'fundamental' ? '2px solid #0066cc' : '1px solid #ddd',
+              background: analysisTab === 'fundamental' ? '#e6f7ff' : 'white',
+              color: analysisTab === 'fundamental' ? '#0066cc' : '#333',
+              cursor: 'pointer',
+            }}
+          >
+            基本面分析
+          </button>
+          <button
+            onClick={() => setAnalysisTab('technical')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '4px',
+              border: analysisTab === 'technical' ? '2px solid #0066cc' : '1px solid #ddd',
+              background: analysisTab === 'technical' ? '#e6f7ff' : 'white',
+              color: analysisTab === 'technical' ? '#0066cc' : '#333',
+              cursor: 'pointer',
+            }}
+          >
+            技术面分析
+          </button>
+        </div>
+
+        {analysisTab === 'fundamental' && fundamentalData && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>市盈率 (PE)</p>
+              <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#0066cc' }}>{fundamentalData.pe}</p>
+            </div>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>市净率 (PB)</p>
+              <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#0066cc' }}>{fundamentalData.pb}</p>
+            </div>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>净资产收益率 (ROE)</p>
+              <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#00cc66' }}>{fundamentalData.roe}%</p>
+            </div>
+            <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>营收增长率</p>
+              <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#00cc66' }}>{fundamentalData.revenueGrowth}%</p>
+            </div>
+          </div>
+        )}
+
+        {analysisTab === 'technical' && technicalData && (
+          <div>
+            <div style={{
+              padding: '16px',
+              backgroundColor: '#fff7e6',
+              border: '1px solid #ffd591',
+              borderRadius: '8px',
+              marginBottom: '16px',
+            }}>
+              <p style={{ margin: 0, fontWeight: '500' }}>{technicalData.trend}</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+              <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>支撑位</p>
+                <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#00cc66' }}>{technicalData.support}</p>
+              </div>
+              <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>阻力位</p>
+                <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#cc0000' }}>{technicalData.resistance}</p>
+              </div>
+              <div style={{ padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#999' }}>RSI</p>
+                <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: technicalData.rsi > 70 ? '#cc0000' : technicalData.rsi < 30 ? '#00cc66' : '#0066cc' }}>{technicalData.rsi}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <button
+          onClick={() => setCurrentStep(3)}
+          style={{
+            padding: '12px 24px',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            background: 'white',
+            cursor: 'pointer',
+            color: '#666',
+          }}
+        >
+          ← 返回推荐产品
+        </button>
+        <button
           onClick={() => navigateTo('dashboard')}
           style={{
             padding: '12px 32px',
@@ -561,7 +814,7 @@ export default function Strategy({ navigateTo }: StrategyProps) {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
-        {[1, 2, 3].map((step) => (
+        {[1, 2, 3, 4].map((step) => (
           <div
             key={step}
             style={{
@@ -578,6 +831,7 @@ export default function Strategy({ navigateTo }: StrategyProps) {
       {currentStep === 1 && renderStep1()}
       {currentStep === 2 && renderStep2()}
       {currentStep === 3 && renderStep3()}
+      {currentStep === 4 && renderStep4()}
     </div>
   );
 }

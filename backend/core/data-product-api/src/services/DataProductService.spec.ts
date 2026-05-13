@@ -50,7 +50,7 @@ describe('DataProductService', () => {
       mockRepository.create.mockImplementation(data => data);
       mockRepository.save.mockResolvedValue({});
       await service.seedDemoData();
-      expect(mockRepository.create).toHaveBeenCalledTimes(150);
+      expect(mockRepository.create).toHaveBeenCalledTimes(240);
     });
   });
 
