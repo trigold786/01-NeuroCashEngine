@@ -20,9 +20,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, RadialLinearScale, Poin
 interface StrategyProps {
   navigateTo: (page: Page) => void;
 }
-  allocation: { CASH: number; DEPOSIT: number; FUND: number; STOCK: number };
-  riskLevel: number;
-}
 
 const QUESTIONS = [
   {

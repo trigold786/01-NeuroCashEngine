@@ -6,6 +6,10 @@ import { DataProductService } from './services/DataProductService';
 import { DataProductController } from './controllers/DataProductController';
 import { SentimentService } from './services/SentimentService';
 import { SentimentController } from './controllers/SentimentController';
+import { CashFlowVelocityService } from './services/CashFlowVelocityService';
+import { CashFlowVelocityController } from './controllers/CashFlowVelocityController';
+import { ProductPreferenceService } from './services/ProductPreferenceService';
+import { ProductPreferenceController } from './controllers/ProductPreferenceController';
 
 @Module({
   imports: [
@@ -23,7 +27,7 @@ import { SentimentController } from './controllers/SentimentController';
     }),
     TypeOrmModule.forFeature([InvestmentSentiment]),
   ],
-  providers: [DataProductService, SentimentService],
-  controllers: [DataProductController, SentimentController],
+  providers: [DataProductService, SentimentService, CashFlowVelocityService, ProductPreferenceService],
+  controllers: [DataProductController, SentimentController, CashFlowVelocityController, ProductPreferenceController],
 })
 export class AppModule {}

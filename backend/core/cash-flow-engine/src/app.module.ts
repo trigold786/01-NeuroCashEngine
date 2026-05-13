@@ -13,10 +13,12 @@ import { CashFlowService } from './services/CashFlowService';
 import { BusinessCashFlowService } from './services/BusinessCashFlowService';
 import { SopExportService } from './services/SopExportService';
 import { StrategyService } from './services/StrategyService';
+import { EnterpriseStrategyService } from './services/EnterpriseStrategyService';
 import { AssetController } from './controllers/AssetController';
 import { CashFlowController } from './controllers/CashFlowController';
 import { BusinessCashFlowController } from './controllers/BusinessCashFlowController';
 import { StrategyController } from './controllers/StrategyController';
+import { EnterpriseStrategyController } from './controllers/EnterpriseStrategyController';
 
 @Module({
   imports: [
@@ -37,7 +39,7 @@ import { StrategyController } from './controllers/StrategyController';
     }),
     TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent]),
   ],
-  providers: [AssetService, CashFlowService, BusinessCashFlowService, SopExportService, StrategyService],
-  controllers: [AssetController, CashFlowController, BusinessCashFlowController, StrategyController],
+  providers: [AssetService, CashFlowService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService],
+  controllers: [AssetController, CashFlowController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController],
 })
 export class AppModule {}

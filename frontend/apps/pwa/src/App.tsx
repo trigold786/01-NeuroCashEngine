@@ -10,8 +10,9 @@ import BusinessCashFlow from './pages/BusinessCashFlow';
 import BusinessSopList from './pages/BusinessSopList';
 import BusinessSopDetail from './pages/BusinessSopDetail';
 import Strategy from './pages/Strategy';
+import EnterpriseStrategy from './pages/EnterpriseStrategy';
 
-export type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail' | 'business-cashflow' | 'business-sops' | 'business-sop-detail' | 'strategy';
+export type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail' | 'business-cashflow' | 'business-sops' | 'business-sop-detail' | 'strategy' | 'enterprise-strategy';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -59,6 +60,8 @@ function App() {
         return <BusinessSopDetail navigateTo={setCurrentPage} sopId={currentSopId} />;
       case 'strategy':
         return <Strategy navigateTo={setCurrentPage} />;
+      case 'enterprise-strategy':
+        return <EnterpriseStrategy navigateTo={setCurrentPage} />;
       default:
         return <Dashboard navigateTo={setCurrentPage} />;
     }
