@@ -124,4 +124,16 @@ export const strategyApi = {
   async getTechnicalAnalysis(stockCode: string): Promise<TechnicalAnalysis> {
     return await cashflowApiClient.get('/strategy/analysis/technical', { params: { stockCode } });
   },
+
+  async getNSIProfile(userId: string): Promise<any> {
+    return await cashflowApiClient.get('/nsi/profile', { params: { userId } });
+  },
+
+  async getEnhancedRisk(userId: string, baseRiskProfile: string): Promise<any> {
+    return await cashflowApiClient.get('/nsi/enhanced-risk', { params: { userId, baseRiskProfile } });
+  },
+
+  async getFinancialHealth(userId: string): Promise<any> {
+    return await cashflowApiClient.get('/nsi/financial-health', { params: { userId } });
+  },
 };

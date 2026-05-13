@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { NSICoordinationService, EnhancedRiskProfile } from './NSICoordinationService';
 
 export interface PortfolioAllocation {
   CASH: number;
@@ -146,6 +147,8 @@ const PRODUCTS: Record<string, Product[]> = {
 export class StrategyService {
   private readonly logger = new Logger(StrategyService.name);
 
+  constructor(private readonly nsiService: NSICoordinationService) {}
+
   calculateRiskScore(answers: Record<string, string>): { score: number; riskProfile: string } {
     const scoreMap: Record<string, number> = { A: 1, B: 2, C: 3 };
     let score = 0;
@@ -273,6 +276,12 @@ export class StrategyService {
       '000333': { trend: '高位震荡，注意控制仓位', support: 55, resistance: 65, rsi: 65 },
     };
     return analyses[stockCode] || { trend: '横盘震荡，方向不明朗', support: 0, resistance: 0, rsi: 50 };
+  }
+
+  async getEnhancedStrategy(userId: string, baseRiskProfile: string): Promise<{ enhancedProfile: EnhancedRiskProfile; recommendation: Recommendation }> {
+    const enhanced = await this.nsiService.getEnhancedRiskProfile(userId, baseRiskProfile);
+    const recommendation = this.generateRecommendation(enhanced.adjustedProfile);
+    return { enhancedProfile: enhanced, recommendation };
   }
 
   generateRecommendationV2(riskProfile: string): Recommendation & { strategy: InvestmentStrategy; tradingPlan: string[] } {

@@ -1,15 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StrategyService } from './StrategyService';
+import { NSICoordinationService } from './NSICoordinationService';
 
 describe('StrategyService', () => {
   let service: StrategyService;
 
+  const mockNSIService = {
+    getEnhancedRiskProfile: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [StrategyService],
+      providers: [
+        StrategyService,
+        { provide: NSICoordinationService, useValue: mockNSIService },
+      ],
     }).compile();
 
     service = module.get<StrategyService>(StrategyService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -199,6 +211,33 @@ describe('StrategyService', () => {
     it('should return default data for unknown product', () => {
       const result = service.getFundamentalAnalysis('UNKNOWN');
       expect(result.pe).toBe(10);
+    });
+  });
+
+  describe('getEnhancedStrategy', () => {
+    it('should return enhanced profile and recommendation', async () => {
+      mockNSIService.getEnhancedRiskProfile.mockResolvedValue({
+        adjustedProfile: 'moderate',
+        adjustmentReason: '社保状态良好',
+      });
+
+      const result = await service.getEnhancedStrategy('user-001', 'aggressive');
+      expect(result.enhancedProfile.adjustedProfile).toBe('moderate');
+      expect(result.recommendation.riskProfile).toBe('moderate');
+      expect(result.recommendation.riskLevel).toBe(2);
+      expect(mockNSIService.getEnhancedRiskProfile).toHaveBeenCalledWith('user-001', 'aggressive');
+    });
+
+    it('should generate conservative recommendation for adjusted profile', async () => {
+      mockNSIService.getEnhancedRiskProfile.mockResolvedValue({
+        adjustedProfile: 'conservative',
+        adjustmentReason: '风险偏好降低',
+      });
+
+      const result = await service.getEnhancedStrategy('user-005', 'aggressive');
+      expect(result.enhancedProfile.adjustedProfile).toBe('conservative');
+      expect(result.recommendation.riskProfile).toBe('conservative');
+      expect(result.recommendation.riskLevel).toBe(1);
     });
   });
 

@@ -90,6 +90,9 @@ export default function Strategy({ navigateTo }: StrategyProps) {
   const [fundamentalData, setFundamentalData] = useState<FundamentalAnalysis | null>(null);
   const [technicalData, setTechnicalData] = useState<TechnicalAnalysis | null>(null);
   const [amount, setAmount] = useState(100000);
+  const [nsiHealth, setNsiHealth] = useState<{ score: number; suggestions: string[] } | null>(null);
+  const [nsiEnhancedRisk, setNsiEnhancedRisk] = useState<{ adjustedProfile: string; adjustmentReason: string } | null>(null);
+  const [nsiLoading, setNsiLoading] = useState(false);
 
   const handleAnswerChange = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -131,6 +134,22 @@ export default function Strategy({ navigateTo }: StrategyProps) {
       const td = await strategyApi.getTechnicalAnalysis('600519');
       setTechnicalData(td);
       setCurrentStep(4);
+
+      setNsiLoading(true);
+      try {
+        const nsiUser = 'user-001';
+        const [healthRes, enhancedRes] = await Promise.all([
+          strategyApi.getFinancialHealth(nsiUser),
+          strategyApi.getEnhancedRisk(nsiUser, recommendation.riskProfile),
+        ]);
+        setNsiHealth(healthRes.data);
+        setNsiEnhancedRisk(enhancedRes.data);
+      } catch {
+        setNsiHealth(null);
+        setNsiEnhancedRisk(null);
+      } finally {
+        setNsiLoading(false);
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message || err.message || 'An error occurred');
     } finally {
@@ -760,6 +779,68 @@ export default function Strategy({ navigateTo }: StrategyProps) {
           </div>
         )}
       </div>
+
+      {(nsiHealth || nsiEnhancedRisk) && (
+        <div style={{
+          background: 'white',
+          padding: '24px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          marginBottom: '24px',
+        }}>
+          <h3 style={{ marginTop: 0, marginBottom: '16px' }}>NSI 协同 - 社保健康评估</h3>
+          {nsiHealth && (
+            <div style={{ marginBottom: nsiEnhancedRisk ? '16px' : 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <span style={{ fontSize: '36px', fontWeight: 'bold', color: nsiHealth.score >= 70 ? '#00cc66' : nsiHealth.score >= 40 ? '#cc6600' : '#cc0000' }}>
+                  {nsiHealth.score}
+                </span>
+                <span style={{ color: '#666' }}>/ 100</span>
+                <span style={{
+                  padding: '4px 12px',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  backgroundColor: nsiHealth.score >= 70 ? '#f6ffed' : nsiHealth.score >= 40 ? '#fff7e6' : '#fff2f2',
+                  color: nsiHealth.score >= 70 ? '#00cc66' : nsiHealth.score >= 40 ? '#cc6600' : '#cc0000',
+                }}>
+                  {nsiHealth.score >= 70 ? '良好' : nsiHealth.score >= 40 ? '一般' : '需关注'}
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {nsiHealth.suggestions.map((s, i) => (
+                  <div key={i} style={{
+                    padding: '8px 12px',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    color: '#555',
+                  }}>
+                    {s}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {nsiEnhancedRisk && (
+            <div style={{
+              padding: '12px',
+              backgroundColor: '#e6f7ff',
+              border: '1px solid #91d5ff',
+              borderRadius: '6px',
+            }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#0066cc' }}>NSI 风险调整</p>
+              <p style={{ margin: 0, fontWeight: '500', color: '#0050b3' }}>
+                {nsiEnhancedRisk.adjustmentReason}
+              </p>
+              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#0050b3' }}>
+                调整后风险等级: <strong>{nsiEnhancedRisk.adjustedProfile === 'conservative' ? '保守型' : nsiEnhancedRisk.adjustedProfile === 'moderate' ? '稳健型' : '激进型'}</strong>
+              </p>
+            </div>
+          )}
+          {nsiLoading && <p style={{ color: '#999' }}>加载 NSI 数据...</p>}
+        </div>
+      )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button

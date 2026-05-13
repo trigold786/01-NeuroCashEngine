@@ -14,6 +14,16 @@ import { RegionalConsumptionService } from './services/RegionalConsumptionServic
 import { RegionalConsumptionController } from './controllers/RegionalConsumptionController';
 import { NSICrossDataService } from './services/NSICrossDataService';
 import { NSICrossDataController } from './controllers/NSICrossDataController';
+import { AnonymizationService } from './services/AnonymizationService';
+import { AnonymizationController } from './controllers/AnonymizationController';
+import { DataAggregationService } from './services/DataAggregationService';
+import { DataAggregationController } from './controllers/DataAggregationController';
+import { ApiKeyAuthGuard } from './guards/ApiKeyAuth.guard';
+import { OAuthGuard } from './guards/OAuthGuard';
+import { RateLimitGuard } from './guards/RateLimit.guard';
+import { ApiKeyController } from './controllers/ApiKeyController';
+import { RateLimitConfigController } from './controllers/RateLimitConfigController';
+import { ApiDocController } from './controllers/ApiDocController';
 
 @Module({
   imports: [
@@ -31,7 +41,11 @@ import { NSICrossDataController } from './controllers/NSICrossDataController';
     }),
     TypeOrmModule.forFeature([InvestmentSentiment]),
   ],
-  providers: [DataProductService, SentimentService, CashFlowVelocityService, ProductPreferenceService, RegionalConsumptionService, NSICrossDataService],
-  controllers: [DataProductController, SentimentController, CashFlowVelocityController, ProductPreferenceController, RegionalConsumptionController, NSICrossDataController],
+  providers: [
+    DataProductService, SentimentService, CashFlowVelocityService, ProductPreferenceService, RegionalConsumptionService, NSICrossDataService, AnonymizationService, DataAggregationService,
+    ApiKeyAuthGuard, OAuthGuard, RateLimitGuard,
+    { provide: 'RATE_LIMIT_CONFIG', useValue: { maxRequests: 100, windowMs: 60000 } },
+  ],
+  controllers: [DataProductController, SentimentController, CashFlowVelocityController, ProductPreferenceController, RegionalConsumptionController, NSICrossDataController, AnonymizationController, DataAggregationController, ApiKeyController, RateLimitConfigController, ApiDocController],
 })
 export class AppModule {}

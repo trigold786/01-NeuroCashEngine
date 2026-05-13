@@ -18,12 +18,14 @@ import { SopExportService } from './services/SopExportService';
 import { StrategyService } from './services/StrategyService';
 import { EnterpriseStrategyService } from './services/EnterpriseStrategyService';
 import { PointsService } from './services/PointsService';
+import { NSICoordinationService } from './services/NSICoordinationService';
 import { AssetController } from './controllers/AssetController';
 import { CashFlowController } from './controllers/CashFlowController';
 import { BusinessCashFlowController } from './controllers/BusinessCashFlowController';
 import { StrategyController } from './controllers/StrategyController';
 import { EnterpriseStrategyController } from './controllers/EnterpriseStrategyController';
 import { PointsController } from './controllers/PointsController';
+import { NSICoordinationController } from './controllers/NSICoordinationController';
 
 @Module({
   imports: [
@@ -45,7 +47,7 @@ import { PointsController } from './controllers/PointsController';
     }),
     TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent, Points, PointsRecord, ReferralCode]),
   ],
-  providers: [AssetService, CashFlowService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService, PointsService],
-  controllers: [AssetController, CashFlowController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController, PointsController],
+  providers: [AssetService, CashFlowService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService, PointsService, NSICoordinationService],
+  controllers: [AssetController, CashFlowController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController, PointsController, NSICoordinationController],
 })
 export class AppModule {}
