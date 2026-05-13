@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Param, Body, Req, Query, Logger } from '@nestjs/common';
 import { CashFlowService } from '../services/CashFlowService';
-import { CashFlowRecordService } from '../services/CashFlowRecordService';
+import { CashFlowRecordService, StatisticsResult } from '../services/CashFlowRecordService';
 import { CreateCashFlowRecordDto } from '../dto/CreateCashFlowRecord.dto';
 
 @Controller('cashflow')
@@ -36,7 +36,7 @@ export class CashFlowController {
     @Req() req: any,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
-  ) {
+  ): Promise<StatisticsResult> {
     const userId = req.user?.id || 'demo-user-1';
     this.logger.log(`GET /cashflow/records/statistics for userId: ${userId}`);
     return await this.cashFlowRecordService.getStatistics(userId, startDate, endDate);

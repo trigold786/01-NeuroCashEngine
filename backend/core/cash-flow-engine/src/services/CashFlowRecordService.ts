@@ -4,14 +4,14 @@ import { Repository, Between, In } from 'typeorm';
 import { CashFlowRecord } from '../entities/CashFlowRecord.entity';
 import { UserAssetAccount } from '../entities/UserAssetAccount.entity';
 
-interface RecordQuery {
+export interface RecordQuery {
   page?: number;
   limit?: number;
   startDate?: string;
   endDate?: string;
 }
 
-interface StatisticsResult {
+export interface StatisticsResult {
   totalIncome: number;
   totalExpense: number;
   netAmount: number;

@@ -7,7 +7,7 @@ import {
   BarElement,
   RadialLinearScale,
   PointElement,
-  RadarElement,
+  Filler,
   Title,
   Tooltip,
   Legend,
@@ -16,7 +16,7 @@ import { Page } from '../App';
 import { strategyApi, Product, Recommendation, InvestmentStrategy, FundamentalAnalysis, TechnicalAnalysis } from '@nce/shared/src/api/strategy';
 import { CardSkeleton, StepSkeleton } from '../components/LoadingSkeleton';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, RadialLinearScale, PointElement, RadarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, RadialLinearScale, PointElement, Filler, Title, Tooltip, Legend);
 
 interface StrategyProps {
   navigateTo: (page: Page) => void;

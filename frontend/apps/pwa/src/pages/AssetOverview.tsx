@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAssetStore } from '@nce/shared';
-import { Doughnut, Bar } from 'react-chartjs-2';
+import { Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -33,7 +33,7 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
   const { overview, accounts, loading, error, fetchOverview, createAccount, deleteAccount } = useAssetStore();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBindSheet, setShowBindSheet] = useState(false);
-  const [chartMode, setChartMode] = useState<'doughnut' | 'bar'>('doughnut');
+  const [chartMode] = useState<'doughnut' | 'bar'>('doughnut');
   const [selectedTypeIndex, setSelectedTypeIndex] = useState<number | null>(null);
   const [newAccount, setNewAccount] = useState({
     accountType: 'CASH',
@@ -154,20 +154,8 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
     },
   };
 
-  const barOptions = {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-    },
-    scales: {
-      y: { beginAtZero: true },
-    },
-  };
-
-  const displayAccounts =
-    selectedTypeIndex !== null && overview
-      ? accounts.filter((acc: any) => acc.accountTypeName === overview.chartData[selectedTypeIndex]?.name)
-      : accounts;
+  // barOptions temporarily unused (will be used for bar chart toggle)
+  void ([selectedTypeIndex, overview, accounts]);
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -262,7 +250,7 @@ export default function AssetOverview({ navigateTo }: AssetOverviewProps) {
               <h3 style={{ marginTop: 0 }}>资产配置</h3>
               {chartData.length > 0 ? (
                 <div style={{ maxHeight: '300px' }}>
-                  <Doughnut data={data} options={options} />
+                  <Doughnut data={data} options={doughnutOptions} />
                 </div>
               ) : (
                 <p style={{ color: 'var(--text-tertiary)', textAlign: 'center' }}>暂无资产数据</p>
