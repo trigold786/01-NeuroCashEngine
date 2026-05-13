@@ -8,6 +8,7 @@ import { IndustryClassification } from '../entities/IndustryClassification.entit
 import { UserAssetAccount } from '../entities/UserAssetAccount.entity';
 import { CashFlowRecord } from '../entities/CashFlowRecord.entity';
 import { CashFlowEvent, EventType } from '../entities/CashFlowEvent.entity';
+import { DataSource } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 
 describe('BusinessCashFlowService', () => {
@@ -20,6 +21,8 @@ describe('BusinessCashFlowService', () => {
   const mockAccountRepository = { find: jest.fn() };
   const mockRecordRepository = { find: jest.fn() };
   const mockEventRepository = { count: jest.fn(), create: jest.fn(), save: jest.fn(), find: jest.fn() };
+  const mockManager = { delete: jest.fn().mockResolvedValue({}), save: jest.fn().mockResolvedValue([]) };
+  const mockDataSource = { transaction: jest.fn().mockImplementation((cb) => cb(mockManager)) };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,6 +35,7 @@ describe('BusinessCashFlowService', () => {
         { provide: getRepositoryToken(UserAssetAccount), useValue: mockAccountRepository },
         { provide: getRepositoryToken(CashFlowRecord), useValue: mockRecordRepository },
         { provide: getRepositoryToken(CashFlowEvent), useValue: mockEventRepository },
+        { provide: DataSource, useValue: mockDataSource },
       ],
     }).compile();
 
@@ -78,18 +82,19 @@ describe('BusinessCashFlowService', () => {
   });
 
   describe('generateForecast', () => {
-    it('should generate forecasts for user', async () => {
+    it('should generate forecasts for user within a transaction', async () => {
       const userId = 'user-1';
       mockAccountRepository.find.mockResolvedValue([{ encryptedBalance: 'encrypted_10000' }]);
-      mockForecastRepository.delete.mockResolvedValue({});
       mockForecastRepository.create.mockImplementation(data => data);
-      mockForecastRepository.save.mockResolvedValue([]);
+      mockManager.delete.mockResolvedValue({});
+      mockManager.save.mockResolvedValue([]);
 
       const result = await service.generateForecast(userId, { forecastDays: 7 });
 
       expect(mockAccountRepository.find).toHaveBeenCalledWith({ where: { userId } });
-      expect(mockForecastRepository.delete).toHaveBeenCalledWith({ userId });
-      expect(mockForecastRepository.save).toHaveBeenCalled();
+      expect(mockDataSource.transaction).toHaveBeenCalled();
+      expect(mockManager.delete).toHaveBeenCalledWith(CashFlowForecast, { userId });
+      expect(mockManager.save).toHaveBeenCalled();
     });
   });
 

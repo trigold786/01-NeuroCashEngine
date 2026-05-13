@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CashFlowForecast } from '../entities/CashFlowForecast.entity';
 import { SopTemplate, SopType } from '../entities/SopTemplate.entity';
 import { GeneratedSop } from '../entities/GeneratedSop.entity';
@@ -30,6 +30,8 @@ export class BusinessCashFlowService {
     private readonly recordRepository: Repository<CashFlowRecord>,
     @InjectRepository(CashFlowEvent)
     private readonly eventRepository: Repository<CashFlowEvent>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   async initializeIndustryData(): Promise<void> {
@@ -68,6 +70,8 @@ export class BusinessCashFlowService {
 ## 1. 立即核实情况
 - 检查账户余额，确认缺口金额和时间点
 - 核实应收款项，排查可提前收回的款项
+- **预估缺口**: ¥{{predictedBalance}} (预测日期: {{forecastDate}})
+- **预警日期**: {{alertDate}}
 
 ## 2. 短期融资选项
 - 选项A：申请银行短期贷款
@@ -77,6 +81,7 @@ export class BusinessCashFlowService {
 ## 3. 执行与跟踪
 - 确定应对方案后立即执行
 - 每日跟踪资金状况
+- **最新余额**: ¥{{latestBalance}}
         `,
       },
       {
@@ -88,6 +93,8 @@ export class BusinessCashFlowService {
 ## 1. 评估资金状况
 - 计算可用闲置资金
 - 确定闲置时间周期
+- **预估盈余**: ¥{{predictedBalance}} (预测日期: {{forecastDate}})
+- **评估日期**: {{alertDate}}
 
 ## 2. 投资选项
 - 选项A：活期理财产品
@@ -97,6 +104,7 @@ export class BusinessCashFlowService {
 ## 3. 执行与监控
 - 选择合适产品并执行
 - 跟踪产品收益和到期时间
+- **最新余额**: ¥{{latestBalance}}
         `,
       },
     ];
@@ -139,8 +147,10 @@ export class BusinessCashFlowService {
       forecasts.push(forecast);
     }
 
-    await this.forecastRepository.delete({ userId });
-    return await this.forecastRepository.save(forecasts);
+    return await this.dataSource.transaction(async (manager) => {
+      await manager.delete(CashFlowForecast, { userId });
+      return await manager.save(forecasts);
+    });
   }
 
   async getForecast(userId: string): Promise<CashFlowForecast[]> {

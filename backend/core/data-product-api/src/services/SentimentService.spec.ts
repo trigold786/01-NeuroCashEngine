@@ -8,7 +8,6 @@ describe('SentimentService', () => {
 
   const mockRepository = {
     find: jest.fn(),
-    findOne: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -43,10 +42,11 @@ describe('SentimentService', () => {
         { date: today, assetCategory: AssetCategory.STOCK, sentimentScore: 75.1, totalSamples: 400 },
       ];
 
-      mockRepository.findOne.mockImplementation(({ where }) => {
-        const category = where.assetCategory;
-        const found = mockData.find(d => d.assetCategory === category);
-        return Promise.resolve(found || null);
+      let callCount = 0;
+      mockRepository.find.mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) return Promise.resolve(mockData);
+        return Promise.resolve([]);
       });
 
       const result = await service.getInvestmentSentiment();
@@ -56,16 +56,16 @@ describe('SentimentService', () => {
       expect(result[1].assetCategory).toBe(AssetCategory.DEPOSIT);
       expect(result[2].assetCategory).toBe(AssetCategory.FUND);
       expect(result[3].assetCategory).toBe(AssetCategory.STOCK);
+      expect(mockRepository.find).toHaveBeenCalledTimes(1);
     });
 
     it('should fallback to any existing data when today has no data', async () => {
       const mockCashData = { date: '2026-05-01', assetCategory: AssetCategory.CASH, sentimentScore: 45.5, totalSamples: 100 };
-      mockRepository.findOne.mockResolvedValue(null);
       let callCount = 0;
-      mockRepository.findOne.mockImplementation(() => {
+      mockRepository.find.mockImplementation(() => {
         callCount++;
-        if (callCount === 8) return Promise.resolve(mockCashData);
-        return Promise.resolve(null);
+        if (callCount === 1) return Promise.resolve([]); // no today data
+        return Promise.resolve([mockCashData]); // fallback
       });
 
       const result = await service.getInvestmentSentiment();
@@ -73,10 +73,11 @@ describe('SentimentService', () => {
       expect(result).toHaveLength(1);
       expect(result[0].assetCategory).toBe(AssetCategory.CASH);
       expect(result[0].date).toBe('2026-05-01');
+      expect(mockRepository.find).toHaveBeenCalledTimes(2);
     });
 
     it('should return empty array when no data exists', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+      mockRepository.find.mockResolvedValue([]);
 
       const result = await service.getInvestmentSentiment();
 
