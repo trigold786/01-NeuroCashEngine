@@ -6,8 +6,10 @@ import { GenerateSopDto } from '../dto/GenerateSop.dto';
 import { CreateCashFlowEventDto } from '../dto/CreateCashFlowEvent.dto';
 import { PermissionGuard } from '../guards/PermissionGuard.guard';
 import { Roles } from '../guards/roles.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('business/cashflow')
+@UseGuards(JwtAuthGuard)
 export class BusinessCashFlowController {
   constructor(
     private readonly service: BusinessCashFlowService,
@@ -81,7 +83,7 @@ export class BusinessCashFlowController {
   async exportSopPdf(@Param('id') id: string, @Req() req: any, @Res() res: any) {
     const userId = req.user?.id || 'demo-user-1';
     const html = await this.sopExportService.generatePdf(id, userId);
-    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="sop-${id}.html"`);
     return res.send(html);
   }
@@ -90,7 +92,7 @@ export class BusinessCashFlowController {
   async exportSopMarkdown(@Param('id') id: string, @Req() req: any, @Res() res: any) {
     const userId = req.user?.id || 'demo-user-1';
     const markdown = await this.sopExportService.generateMarkdown(id, userId);
-    res.setHeader('Content-Type', 'text/markdown');
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="sop-${id}.md"`);
     return res.send(markdown);
   }

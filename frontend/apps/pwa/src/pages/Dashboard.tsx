@@ -95,12 +95,20 @@ export default function Dashboard({ navigateTo, setCurrentNewsId }: DashboardPro
         marginBottom: '30px'
       }}>
         <h1>NeuroCashEngine 控制台</h1>
-        <button
-          onClick={logout}
-          style={{ padding: '10px 20px', backgroundColor: 'var(--semantic-red)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-        >
-          退出登录
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => navigateTo('user-settings')}
+            style={{ padding: '10px 20px', backgroundColor: 'var(--brand-blue)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            👤 用户中心
+          </button>
+          <button
+            onClick={logout}
+            style={{ padding: '10px 20px', backgroundColor: 'var(--semantic-red)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            退出登录
+          </button>
+        </div>
       </div>
 
       <div style={{

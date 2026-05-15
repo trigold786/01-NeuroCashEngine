@@ -18,14 +18,25 @@ import TermsPage from './pages/TermsPage';
 import ApiPlayground from './pages/ApiPlayground';
 import ThemeToggle from './components/ThemeToggle';
 import AlertBanner from './components/AlertBanner';
+import UserSettings from './pages/UserSettings';
 
-export type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail' | 'business-cashflow' | 'business-sops' | 'business-sop-detail' | 'strategy' | 'enterprise-strategy' | 'portfolio-monitoring' | 'points' | 'subscription' | 'notifications' | 'privacy' | 'terms' | 'api-playground';
+export type Page = 'login' | 'register' | 'dashboard' | 'assets' | 'news' | 'news-detail' | 'business-cashflow' | 'business-sops' | 'business-sop-detail' | 'strategy' | 'enterprise-strategy' | 'portfolio-monitoring' | 'points' | 'subscription' | 'notifications' | 'privacy' | 'terms' | 'api-playground' | 'user-settings';
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [currentPage, setCurrentPage] = React.useState<Page>(isAuthenticated ? 'dashboard' : 'login');
   const [currentNewsId, setCurrentNewsId] = React.useState<string | null>(null);
   const [currentSopId, setCurrentSopId] = React.useState<string | null>(null);
+  const [currentTheme, setCurrentTheme] = React.useState<string>(
+    typeof window !== 'undefined' ? localStorage.getItem('theme') || 'light' : 'light'
+  );
+
+  const toggleTheme = () => {
+    const next = currentTheme === 'dark' ? 'light' : 'dark';
+    setCurrentTheme(next);
+    localStorage.setItem('theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem('theme');
@@ -86,6 +97,8 @@ function App() {
         return <PrivacyPage navigateTo={setCurrentPage} />;
       case 'terms':
         return <TermsPage navigateTo={setCurrentPage} />;
+      case 'user-settings':
+        return <UserSettings navigateTo={setCurrentPage} currentTheme={currentTheme} onToggleTheme={toggleTheme} />;
       case 'api-playground':
         return <ApiPlayground navigateTo={setCurrentPage} />;
       default:

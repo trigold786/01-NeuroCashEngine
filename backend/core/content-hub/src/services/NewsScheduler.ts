@@ -18,35 +18,40 @@ export class NewsScheduler {
 
   @Cron(CronExpression.EVERY_10_MINUTES)
   async fetchLatestNews() {
-    this.logger.log('Fetching latest news from East Money...');
+    this.logger.log('Fetching latest news from Sina Finance...');
     try {
       const { data } = await firstValueFrom(
-        this.http.get('http://nce-aktools:8080/api/public/stock_info_cjpl', { timeout: 15000 })
+        this.http.get('https://feed.mix.sina.com.cn/api/roll/get', {
+          params: { pageid: 153, lid: 2516, k: '', num: 10 },
+          headers: { 'User-Agent': 'Mozilla/5.0' },
+          timeout: 15000,
+        })
       );
-      const items: any[] = Array.isArray(data) ? data : [];
+      const items: any[] = data?.result?.data || [];
       let added = 0;
-      for (const item of items.slice(0, 10)) {
-        const title = String(item['标题'] || item['title'] || '').trim();
+      for (const item of items) {
+        const title = String(item['title'] || '').trim();
         if (!title) continue;
         const exists = await this.newsRepository.findOne({ where: { title } });
         if (exists) continue;
+        const url = String(item['url'] || '');
         const news = this.newsRepository.create({
           title,
-          summary: String(item['简介'] || item['summary'] || item['content'] || '').slice(0, 512),
-          content: String(item['content'] || item['简介'] || item['summary'] || ''),
+          summary: title,
+          content: title,
           category: NewsCategory.GENERAL,
-          sourceType: NewsSourceType.OFFICIAL,
-          sourceName: String(item['来源'] || item['source'] || 'East Money'),
-          sourceUrl: String(item['url'] || item['link'] || item['sourceUrl'] || ''),
-          author: String(item['作者'] || item['author'] || ''),
-          publishTime: new Date(),
+          sourceType: NewsSourceType.VERIFIED,
+          sourceName: '新浪财经',
+          sourceUrl: url,
+          author: '新浪财经',
+          publishTime: new Date(parseInt(String(item['ctime'] || '0')) * 1000),
           isVerified: true,
-          isLinkValid: false,
+          isLinkValid: url.startsWith('http'),
         });
         await this.newsRepository.save(news);
         added++;
       }
-      this.logger.log(`News fetch complete: ${added} new articles`);
+      this.logger.log(`News fetch complete: ${added} new articles from Sina`);
     } catch (err) {
       this.logger.warn(`News fetch failed: ${(err as Error).message}`);
     }
