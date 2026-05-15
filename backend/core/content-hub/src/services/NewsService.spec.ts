@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NewsService } from './NewsService';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios';
 import { News, NewsCategory, NewsSourceType } from '../entities/News.entity';
 import { NotFoundException } from '@nestjs/common';
 
@@ -19,6 +20,7 @@ describe('NewsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [HttpModule],
       providers: [
         NewsService,
         {

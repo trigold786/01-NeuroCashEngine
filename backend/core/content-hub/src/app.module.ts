@@ -1,13 +1,18 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
+import { ScheduleModule } from '@nestjs/schedule';
 import { News } from './entities/News.entity';
 import { NewsService } from './services/NewsService';
 import { NewsController } from './controllers/NewsController';
+import { NewsScheduler } from './services/NewsScheduler';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    HttpModule,
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
@@ -21,7 +26,7 @@ import { NewsController } from './controllers/NewsController';
     }),
     TypeOrmModule.forFeature([News]),
   ],
-  providers: [NewsService],
+  providers: [NewsService, NewsScheduler],
   controllers: [NewsController],
 })
 export class AppModule {}

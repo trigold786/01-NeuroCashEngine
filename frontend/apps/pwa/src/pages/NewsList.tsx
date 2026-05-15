@@ -32,6 +32,11 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
     fetchNewsList({ category: categoryValue, sourceType: sourceValue, keyword: keyword || undefined });
   }, [fetchNewsList, selectedCategory, selectedSource, keyword]);
 
+  useEffect(() => {
+    const interval = setInterval(() => fetchNewsList({ limit: 20 }), 600000);
+    return () => clearInterval(interval);
+  }, [fetchNewsList]);
+
   const getSourceTypeLabel = (type: NewsSourceType): string => {
     return type === NewsSourceType.OFFICIAL ? '官方' : '已验证';
   };

@@ -29,7 +29,7 @@ services:
       - nce-network
 
   postgres:
-    image: postgres:16
+    image: postgres:18
     container_name: nce-postgres
     ports:
       - "5433:5432"

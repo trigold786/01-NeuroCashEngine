@@ -27,7 +27,7 @@ export default function Dashboard({ navigateTo, setCurrentNewsId }: DashboardPro
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleManualRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -57,6 +57,8 @@ export default function Dashboard({ navigateTo, setCurrentNewsId }: DashboardPro
     fetchIndustries();
     fetchOverview();
     fetchNewsList({ limit: 5 });
+    const interval = setInterval(() => fetchNewsList({ limit: 5 }), 600000);
+    return () => clearInterval(interval);
   }, [fetchIndustries, fetchOverview, fetchNewsList]);
 
   const isBusinessUser = user?.accountType === AccountType.ENTERPRISE || user?.role === UserRole.ENTERPRISE;
@@ -464,7 +466,6 @@ export default function Dashboard({ navigateTo, setCurrentNewsId }: DashboardPro
                   style={{ opacity: 0, width: 0, height: 0 }}
                 />
                 <span
-                  onClick={() => setAutoRefresh(!autoRefresh)}
                   style={{
                     position: 'absolute',
                     cursor: 'pointer',

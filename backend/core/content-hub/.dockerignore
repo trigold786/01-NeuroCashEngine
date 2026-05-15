@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+dist
+*.tsbuildinfo
+.git
+.gitignore
+*.md
+src/**/*.spec.ts
+src/**/*.test.ts
+test
+coverage
+.env
+.env.*
