@@ -3,91 +3,104 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { MarketDataProvider, StockQuote, FundNAV, KLineData, MarketDataError } from './provider.interface';
 
-const AKTOOLS_URL = process.env.AKTOOLS_URL || 'http://nce-aktools:8080';
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
 
 @Injectable()
 export class AktoolsProvider implements MarketDataProvider {
   private readonly logger = new Logger(AktoolsProvider.name);
-  private readonly timeout = 10000;
+  private readonly timeout = 15000;
 
   constructor(private readonly http: HttpService) {}
 
   async getStockQuotes(codes: string[]): Promise<StockQuote[]> {
     try {
+      const secids = codes.map(c => (c.startsWith('6') ? '1.' : '0.') + c).join(',');
+      const params = { fltt: '2', invt: '2', fields: 'f2,f3,f4,f12,f14', secids };
       const { data } = await firstValueFrom(
-        this.http.get(`${AKTOOLS_URL}/api/public/stock_zh_a_spot_em`, { timeout: this.timeout })
+        this.http.get('https://push2.eastmoney.com/api/qt/ulist.np/get', {
+          params, headers: { 'User-Agent': UA }, timeout: this.timeout,
+        })
       );
-      const allStocks: any[] = Array.isArray(data) ? data : (data?.data || []);
-      const codeSet = new Set(codes);
-      return allStocks
-        .filter((s: any) => codeSet.has(String(s['代码'])))
-        .map((s: any) => ({
-          code: String(s['代码']),
-          name: String(s['名称'] || ''),
-          price: Number(s['最新价'] || 0),
-          changePercent: Number(s['涨跌幅'] || 0),
-          changeAmount: Number(s['涨跌额'] || 0),
-          high: Number(s['最高'] || 0),
-          low: Number(s['最低'] || 0),
-          open: Number(s['今开'] || 0),
-          prevClose: Number(s['昨收'] || 0),
-          volume: Number(s['成交量'] || 0),
-          turnover: Number(s['成交额'] || 0),
-          timestamp: new Date(),
-        }));
+      const items: any[] = data?.data?.diff || [];
+      return items.map((s: any) => ({
+        code: String(s['f12']),
+        name: String(s['f14'] || ''),
+        price: Number(s['f2'] ?? 0),
+        changePercent: Number(s['f3'] ?? 0),
+        changeAmount: Number(s['f4'] ?? 0),
+        high: 0, low: 0, open: 0, prevClose: 0,
+        volume: 0, turnover: 0,
+        timestamp: new Date(),
+      }));
     } catch (err) {
-      throw new MarketDataError((err as Error).message, 'AKTools');
+      throw new MarketDataError((err as Error).message, 'EastMoney');
     }
   }
 
   async getFundNAVs(codes: string[]): Promise<FundNAV[]> {
-    try {
-      const { data } = await firstValueFrom(
-        this.http.get(`${AKTOOLS_URL}/api/public/fund_open_fund_daily_em`, { timeout: this.timeout })
-      );
-      const allFunds: any[] = Array.isArray(data) ? data : (data?.data || []);
-      const codeSet = new Set(codes);
-      return allFunds
-        .filter((f: any) => codeSet.has(String(f['基金代码'])))
-        .map((f: any) => ({
-          code: String(f['基金代码']),
-          name: String(f['基金简称'] || ''),
-          nav: Number(f['单位净值'] || 0),
-          accNav: Number(f['累计净值'] || 0),
-          navDate: String(f['净值日期'] || ''),
-          dayChangePercent: Number(f['日增长率'] || 0),
-        }));
-    } catch (err) {
-      throw new MarketDataError((err as Error).message, 'AKTools');
+    const results: FundNAV[] = [];
+    for (const code of codes) {
+      try {
+        const { data } = await firstValueFrom(
+          this.http.get(`http://fundgz.1234567.com.cn/js/${code}.js`, {
+            headers: { 'User-Agent': UA, Referer: 'http://fund.eastmoney.com' },
+            timeout: this.timeout,
+            responseType: 'text',
+          })
+        );
+        const match = (data as string).match(/jsonpgz\((.+)\)/);
+        if (match) {
+          const item = JSON.parse(match[1]);
+          results.push({
+            code: String(item.fundcode),
+            name: String(item.name || ''),
+            nav: Number(item.dwjz ?? 0),
+            accNav: 0,
+            navDate: String(item.jzrq || ''),
+            dayChangePercent: Number(item.gszzl ?? 0),
+          });
+        }
+      } catch (err) {
+        this.logger.warn(`Fund NAV fetch failed for ${code}: ${(err as Error).message}`);
+      }
     }
+    return results;
   }
 
   async getKLine(code: string, period: string = 'daily', days: number = 90): Promise<KLineData[]> {
     try {
+      const prefix = code.startsWith('6') ? '1' : '0';
+      const url = 'https://push2his.eastmoney.com/api/qt/stock/kline/get';
+      const params = {
+        secid: `${prefix}.${code}`, fields1: 'f1,f2,f3',
+        fields2: 'f51,f52,f53,f54,f55,f56,f57',
+        klt: period === 'weekly' ? 102 : 101,
+        fqt: 1, end: '20500101', lmt: days,
+      };
       const { data } = await firstValueFrom(
-        this.http.get(`${AKTOOLS_URL}/api/public/stock_zh_a_hist`, {
-          params: { symbol: code, period },
-          timeout: this.timeout,
-        })
+        this.http.get(url, { params, headers: { 'User-Agent': UA }, timeout: this.timeout })
       );
-      const rows: any[] = Array.isArray(data) ? data : (data?.data || []);
-      return rows.slice(-days).map((r: any) => ({
-        date: String(r['日期'] || ''),
-        open: Number(r['开盘'] || 0),
-        close: Number(r['收盘'] || 0),
-        high: Number(r['最高'] || 0),
-        low: Number(r['最低'] || 0),
-        volume: Number(r['成交量'] || 0),
-        amount: Number(r['成交额'] || 0),
-      }));
+      const klines: string[] = data?.data?.klines || [];
+      return klines.map((k: string) => {
+        const parts = k.split(',');
+        return {
+          date: parts[0] || '',
+          open: parseFloat(parts[1]) || 0,
+          close: parseFloat(parts[2]) || 0,
+          high: parseFloat(parts[3]) || 0,
+          low: parseFloat(parts[4]) || 0,
+          volume: parseFloat(parts[5]) || 0,
+          amount: parseFloat(parts[6]) || 0,
+        };
+      });
     } catch (err) {
-      throw new MarketDataError((err as Error).message, 'AKTools');
+      throw new MarketDataError((err as Error).message, 'EastMoney');
     }
   }
 
   async healthCheck(): Promise<boolean> {
     try {
-      await firstValueFrom(this.http.get(`${AKTOOLS_URL}/api/public/stock_zh_a_spot_em`, { timeout: 5000 }));
+      await this.getStockQuotes(['000001']);
       return true;
     } catch {
       return false;
