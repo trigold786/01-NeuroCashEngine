@@ -7,3 +7,8 @@ dist/
 *.log
 *.swp
 coverage/
+
+capacitor.config.json
+android/app/build/
+ios/Pods/
+ios/build/
