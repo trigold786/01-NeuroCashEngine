@@ -1,16 +1,50 @@
-version: '3.8'
 services:
+  traefik:
+    image: docker.m.daocloud.io/traefik:latest
+    container_name: nce-traefik
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - ./traefik/dev-cert.pem:/etc/traefik/certs/dev-cert.pem:ro
+      - ./traefik/dev-key.pem:/etc/traefik/certs/dev-key.pem:ro
+      - traefik-letsencrypt:/letsencrypt
+    command:
+      - "--api.dashboard=true"
+      - "--api.debug=true"
+      - "--log.level=DEBUG"
+      - "--ping=true"
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-admin@neurocashengine.com}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+    restart: unless-stopped
+    networks:
+      - nce-network
+
   postgres:
     image: postgres:16
     container_name: nce-postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_USER: ${DB_USER:-nce_root}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-nce_root_123}
       POSTGRES_DB: nce_db
     volumes:
       - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nce_root -d nce_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
     networks:
       - nce-network
 
@@ -18,17 +52,23 @@ services:
     image: redis:7-alpine
     container_name: nce-redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
     networks:
       - nce-network
 
   account-center:
     build: ./backend/shared/account-center
     container_name: nce-account-center
-    ports:
-      - "3001:3001"
+    expose:
+      - "3001"
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -39,16 +79,19 @@ services:
       - REDIS_PORT=6379
       - JWT_SECRET=${JWT_SECRET:-nce_jwt_secret_key_123}
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: on-failure
     networks:
       - nce-network
 
   cash-flow-engine:
     build: ./backend/core/cash-flow-engine
     container_name: nce-cash-flow-engine
-    ports:
-      - "3005:3005"
+    expose:
+      - "3005"
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -57,15 +100,17 @@ services:
       - DB_NAME=nce_db
       - JWT_SECRET=${JWT_SECRET:-nce_jwt_secret_key_123}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: on-failure
     networks:
       - nce-network
 
   content-hub:
     build: ./backend/core/content-hub
     container_name: nce-content-hub
-    ports:
-      - "3006:3006"
+    expose:
+      - "3006"
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -73,15 +118,17 @@ services:
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: on-failure
     networks:
       - nce-network
 
   data-product-api:
     build: ./backend/core/data-product-api
     container_name: nce-data-product-api
-    ports:
-      - "3007:3007"
+    expose:
+      - "3007"
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -89,29 +136,31 @@ services:
       - DB_PASSWORD=${DB_PASSWORD:-nce_root_123}
       - DB_NAME=nce_db
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: on-failure
     networks:
       - nce-network
 
   frontend:
-    build: ./frontend/apps/pwa
+    build:
+      context: ./frontend
+      dockerfile: apps/pwa/Dockerfile
     container_name: nce-frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - VITE_ACCOUNT_API_URL=http://account-center:3001
-      - VITE_CASHFLOW_API_URL=http://cash-flow-engine:3005
-      - VITE_CONTENT_API_URL=http://content-hub:3006
+    expose:
+      - "80"
     depends_on:
       - account-center
       - cash-flow-engine
       - content-hub
+    restart: unless-stopped
     networks:
       - nce-network
 
 volumes:
   postgres-data:
   redis-data:
+  traefik-letsencrypt:
 
 networks:
   nce-network:

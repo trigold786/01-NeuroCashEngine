@@ -1,0 +1,107 @@
+http:
+  routers:
+    dashboard:
+      rule: "Host(`traefik.localhost`)"
+      service: "api@internal"
+      middlewares:
+        - "auth"
+
+    account-center:
+      rule: "PathPrefix(`/api/`)"
+      entrypoints:
+        - "websecure"
+      service: "account-center"
+      tls: {}
+
+    cashflow-assets-overview:
+      rule: "Path(`/assets/overview`)"
+      entrypoints:
+        - "websecure"
+      service: "cashflow"
+      tls: {}
+
+    cashflow-assets-accounts:
+      rule: "Path(`/assets/accounts`)"
+      entrypoints:
+        - "websecure"
+      service: "cashflow"
+      tls: {}
+
+    cashflow:
+      rule: "PathPrefix(`/cashflow/`) || PathPrefix(`/business/`) || PathPrefix(`/strategy/`) || PathPrefix(`/enterprise/`) || PathPrefix(`/nsi/`) || PathPrefix(`/subscription/`) || Path(`/notifications`) || PathPrefix(`/points/`) || Path(`/config`) || Path(`/products`)"
+      entrypoints:
+        - "websecure"
+      service: "cashflow"
+      tls: {}
+
+    content-hub:
+      rule: "Path(`/news`)"
+      entrypoints:
+        - "websecure"
+      service: "content-hub"
+      tls: {}
+
+    data-product-dp:
+      rule: "PathPrefix(`/dp/`)"
+      entrypoints:
+        - "websecure"
+      middlewares:
+        - "strip-dp-prefix"
+      service: "data-product-api"
+      tls: {}
+
+    data-product-api:
+      rule: "PathPrefix(`/data-product/`)"
+      entrypoints:
+        - "websecure"
+      service: "data-product-api"
+      tls: {}
+
+    frontend:
+      rule: "HostRegexp(`^.+$`)"
+      entrypoints:
+        - "websecure"
+      service: "frontend"
+      tls: {}
+
+  services:
+    account-center:
+      loadBalancer:
+        servers:
+          - url: "http://nce-account-center:3001"
+
+    cashflow:
+      loadBalancer:
+        servers:
+          - url: "http://nce-cash-flow-engine:3005"
+
+    content-hub:
+      loadBalancer:
+        servers:
+          - url: "http://nce-content-hub:3006"
+
+    data-product-api:
+      loadBalancer:
+        servers:
+          - url: "http://nce-data-product-api:3007"
+
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://nce-frontend:80"
+
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "admin:$$2y$$10$$xxxxxxxxxxx"
+
+    strip-dp-prefix:
+      stripPrefix:
+        prefixes:
+          - "/dp"
+
+tls:
+  certificates:
+    - certFile: /etc/traefik/certs/dev-cert.pem
+      keyFile: /etc/traefik/certs/dev-key.pem
