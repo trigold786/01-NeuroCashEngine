@@ -46,8 +46,18 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
     navigateTo('news-detail');
   };
 
+  const getCategoryColor = (category: NewsCategory): string => {
+    switch (category) {
+      case NewsCategory.STOCK: return '#cc0000';
+      case NewsCategory.FUND: return '#cc6600';
+      case NewsCategory.BOND: return '#0066cc';
+      case NewsCategory.MACRO: return '#722ed1';
+      default: return '#8c8c8c';
+    }
+  };
+
   return (
-    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '24px' }}>
         <button
           onClick={() => navigateTo('dashboard')}
@@ -131,17 +141,21 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
       {loading && <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>加载中...</p>}
       {error && <p style={{ color: 'var(--semantic-red)', textAlign: 'center' }}>{error}</p>}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
         {newsList.map((news) => (
           <div
             key={news.id}
             style={{
               background: 'var(--bg-card)',
-              padding: '20px',
               borderRadius: '8px',
               boxShadow: 'var(--shadow-card)',
               cursor: 'pointer',
               transition: 'transform 0.2s, box-shadow 0.2s',
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '180px',
+              borderLeft: `4px solid ${getCategoryColor(news.category)}`,
+              overflow: 'hidden',
             }}
             onClick={() => handleNewsClick(news)}
             onMouseEnter={(e) => {
@@ -153,40 +167,38 @@ export default function NewsList({ navigateTo, setCurrentNewsId }: NewsListProps
               e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.08)';
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' as const }}>
-              <span
-                style={{
-                  padding: '2px 8px',
-                  fontSize: '12px',
-                  borderRadius: '12px',
-                  backgroundColor: news.sourceType === NewsSourceType.OFFICIAL ? '#e6f7ff' : '#f6ffed',
-                  color: news.sourceType === NewsSourceType.OFFICIAL ? 'var(--brand-blue)' : 'var(--semantic-green)'
-                }}
-              >
-                {getSourceTypeLabel(news.sourceType)}
-              </span>
-              <span
-                style={{
-                  padding: '2px 8px',
-                  fontSize: '12px',
-                  borderRadius: '12px',
-                  backgroundColor: 'var(--bg-secondary)',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                {categories.find(c => c.key === news.category)?.label || news.category}
-              </span>
-            </div>
-
-            <h3 style={{ fontSize: '18px', marginBottom: '8px' }}>{news.title}</h3>
-
-            {news.summary && (
-              <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '12px' }}>{news.summary}</p>
+            {news.imageUrl && (
+              <div style={{
+                width: '100%',
+                height: '120px',
+                backgroundColor: 'var(--bg-secondary)',
+                backgroundImage: `url(${news.imageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }} />
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-tertiary)', fontSize: '12px' }}>
-              <span>{[news.sourceName, news.author, news.publishTime ? new Date(news.publishTime).toLocaleDateString('zh-CN') : null].filter(Boolean).join(' · ')}</span>
-              <span>{news.viewCount} 阅读</span>
+            <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' as const }}>
+                <span style={{ padding: '2px 8px', fontSize: '12px', borderRadius: '12px', backgroundColor: news.sourceType === NewsSourceType.OFFICIAL ? '#e6f7ff' : '#f6ffed', color: news.sourceType === NewsSourceType.OFFICIAL ? 'var(--brand-blue)' : 'var(--semantic-green)' }}>
+                  {getSourceTypeLabel(news.sourceType)}
+                </span>
+                <span style={{ padding: '2px 8px', fontSize: '12px', borderRadius: '12px', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
+                  {categories.find(c => c.key === news.category)?.label || news.category}
+                </span>
+                <span style={{ color: 'var(--text-tertiary)', fontSize: '12px' }}>{[news.sourceName, news.author].filter(Boolean).join(' · ')}</span>
+              </div>
+
+              <h3 style={{ fontSize: '16px', marginBottom: '8px', marginTop: 0, lineHeight: 1.4 }}>{news.title}</h3>
+
+              {news.summary && (
+                <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '12px', flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{news.summary}</p>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-tertiary)', fontSize: '12px', marginTop: 'auto' }}>
+                <span>{news.publishTime ? `🕐 ${new Date(news.publishTime).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}` : ''}</span>
+                <span>{news.viewCount} 阅读</span>
+              </div>
             </div>
           </div>
         ))}

@@ -46,6 +46,9 @@ export interface EnterpriseQuestionnaire {
   industryRisk: 'A' | 'B' | 'C';
   emergencyFund: 'A' | 'B' | 'C';
   investmentExperience: 'A' | 'B' | 'C';
+  employeeCount: 'A' | 'B' | 'C';
+  receivableRatio: 'A' | 'B' | 'C';
+  taxCompliance: 'A' | 'B' | 'C';
 }
 
 export interface EnterpriseRiskProfile {

@@ -20,6 +20,20 @@ export interface CreateAssetAccountData {
   stockCode?: string;
   stockName?: string;
   currentPrice?: number;
+  bondCode?: string;
+  bondName?: string;
+  bondType?: string;
+  maturityDate?: string;
+  couponRate?: number;
+  goldType?: string;
+  holdWeight?: number;
+  futuresCode?: string;
+  futuresName?: string;
+  margin?: number;
+  contractUnit?: number;
+  reitsCode?: string;
+  reitsName?: string;
+  dividendYield?: number;
 }
 
 export const assetApi = {

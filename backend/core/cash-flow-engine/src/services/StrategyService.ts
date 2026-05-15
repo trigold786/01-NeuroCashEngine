@@ -164,13 +164,13 @@ export class StrategyService {
   }
 
   calculateRiskProfile(score: number): string {
-    if (score >= 5 && score <= 8) {
+    if (score >= 8 && score <= 13) {
       return 'conservative';
     }
-    if (score >= 9 && score <= 12) {
+    if (score >= 14 && score <= 19) {
       return 'moderate';
     }
-    if (score >= 13 && score <= 15) {
+    if (score >= 20 && score <= 24) {
       return 'aggressive';
     }
     return 'conservative';

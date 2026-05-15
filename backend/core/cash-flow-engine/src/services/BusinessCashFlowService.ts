@@ -45,6 +45,37 @@ export class BusinessCashFlowService {
       { industryCode: 62, industryName: '餐饮业', level: 1 },
       { industryCode: 71, industryName: '租赁业', level: 1 },
       { industryCode: 72, industryName: '商务服务业', level: 1 },
+      { industryCode: 13, industryName: '农副食品加工业', level: 1 },
+      { industryCode: 14, industryName: '食品制造业', level: 1 },
+      { industryCode: 17, industryName: '纺织业', level: 1 },
+      { industryCode: 18, industryName: '纺织服装服饰业', level: 1 },
+      { industryCode: 20, industryName: '木材加工和木制品业', level: 1 },
+      { industryCode: 21, industryName: '家具制造业', level: 1 },
+      { industryCode: 23, industryName: '印刷和记录媒介复制业', level: 1 },
+      { industryCode: 24, industryName: '文教工美体育娱乐用品制造业', level: 1 },
+      { industryCode: 26, industryName: '化学原料和化学制品制造业', level: 1 },
+      { industryCode: 31, industryName: '非金属矿物制品业', level: 1 },
+      { industryCode: 33, industryName: '金属制品业', level: 1 },
+      { industryCode: 34, industryName: '通用设备制造业', level: 1 },
+      { industryCode: 35, industryName: '专用设备制造业', level: 1 },
+      { industryCode: 36, industryName: '汽车制造业', level: 1 },
+      { industryCode: 38, industryName: '电气机械和器材制造业', level: 1 },
+      { industryCode: 39, industryName: '计算机通信和其他电子设备制造业', level: 1 },
+      { industryCode: 40, industryName: '仪器仪表制造业', level: 1 },
+      { industryCode: 41, industryName: '其他制造业', level: 1 },
+      { industryCode: 43, industryName: '金属制品机械和设备修理业', level: 1 },
+      { industryCode: 49, industryName: '建筑装饰业', level: 1 },
+      { industryCode: 55, industryName: '居民服务业', level: 1 },
+      { industryCode: 56, industryName: '机动车电子产品和日用产品修理业', level: 1 },
+      { industryCode: 59, industryName: '仓储业', level: 1 },
+      { industryCode: 63, industryName: '电信广播电视和卫星传输服务', level: 1 },
+      { industryCode: 64, industryName: '互联网和相关服务', level: 1 },
+      { industryCode: 65, industryName: '软件和信息技术服务业', level: 1 },
+      { industryCode: 70, industryName: '房地产业', level: 1 },
+      { industryCode: 73, industryName: '研究和试验发展', level: 1 },
+      { industryCode: 74, industryName: '专业技术服务业', level: 1 },
+      { industryCode: 80, industryName: '机动车电子产品和日用产品修理业', level: 1 },
+      { industryCode: 81, industryName: '其他服务业', level: 1 },
     ];
 
     for (const industry of industries) {
@@ -57,9 +88,6 @@ export class BusinessCashFlowService {
   }
 
   async initializeSopTemplates(): Promise<void> {
-    const count = await this.templateRepository.count();
-    if (count > 0) return;
-
     const templates = [
       {
         type: SopType.SHORTAGE,
@@ -107,12 +135,10 @@ export class BusinessCashFlowService {
 - **最新余额**: ¥{{latestBalance}}
         `,
       },
-    ];
-
-    const loanDueTemplate = {
-      type: SopType.LOAN_DUE,
-      title: '贷款到期应对SOP',
-      content: `
+      {
+        type: SopType.LOAN_DUE,
+        title: '贷款到期应对SOP',
+        content: `
 # 贷款到期应对SOP
 
 ## 1. 确认贷款信息
@@ -130,13 +156,12 @@ export class BusinessCashFlowService {
 - 确定还款方案后立即执行
 - 确认还款到账并保留凭证
 - **最新余额**: ¥{{latestBalance}}
-      `,
-    };
-
-    const receivableDueTemplate = {
-      type: SopType.RECEIVABLE_DUE,
-      title: '应收款项催收SOP',
-      content: `
+        `,
+      },
+      {
+        type: SopType.RECEIVABLE_DUE,
+        title: '应收款项催收SOP',
+        content: `
 # 应收款项催收SOP
 
 ## 1. 核实应收信息
@@ -154,14 +179,23 @@ export class BusinessCashFlowService {
 - 实施催收方案并持续跟进
 - 记录催收过程和结果
 - **最新余额**: ¥{{latestBalance}}
-      `,
-    };
-
-    templates.push(loanDueTemplate, receivableDueTemplate);
+        `,
+      },
+    ];
 
     for (const template of templates) {
-      const entity = this.templateRepository.create(template);
-      await this.templateRepository.save(entity);
+      const existing = await this.templateRepository.findOne({
+        where: { type: template.type },
+      });
+      if (existing) {
+        existing.title = template.title;
+        existing.content = template.content;
+        existing.isActive = true;
+        await this.templateRepository.save(existing);
+      } else {
+        const entity = this.templateRepository.create(template);
+        await this.templateRepository.save(entity);
+      }
     }
   }
 
@@ -265,8 +299,8 @@ export class BusinessCashFlowService {
       order: { forecastDate: 'ASC' },
     });
 
-    const alertForecast = forecasts.find(f => f.isAlert) || forecasts[0];
-    const latestForecast = forecasts[forecasts.length - 1];
+    const alertForecast = forecasts.length > 0 ? (forecasts.find(f => f.isAlert) || forecasts[0]) : null;
+    const latestForecast = forecasts.length > 0 ? forecasts[forecasts.length - 1] : null;
 
     let filledContent = template.content;
     if (alertForecast) {
@@ -275,12 +309,18 @@ export class BusinessCashFlowService {
       const alertDate = new Date(alertForecast.forecastDate);
       alertDate.setDate(alertDate.getDate() - 3);
       filledContent = filledContent.replace(/\{\{alertDate\}\}/g, alertDate.toISOString().split('T')[0]);
+    } else {
+      filledContent = filledContent.replace(/\{\{predictedBalance\}\}/g, '0.00');
+      filledContent = filledContent.replace(/\{\{forecastDate\}\}/g, new Date().toISOString().split('T')[0]);
+      filledContent = filledContent.replace(/\{\{alertDate\}\}/g, new Date().toISOString().split('T')[0]);
     }
     if (latestForecast) {
       filledContent = filledContent.replace(/\{\{latestBalance\}\}/g, latestForecast.predictedBalance.toFixed(2));
+    } else {
+      filledContent = filledContent.replace(/\{\{latestBalance\}\}/g, '0.00');
     }
 
-    const title = dto.title || `${type === SopType.SHORTAGE ? '资金短缺' : '资金盈余'}应对方案`;
+    const title = dto.title || `${type === SopType.SHORTAGE ? '资金短缺' : type === SopType.SURPLUS ? '资金盈余' : type === SopType.LOAN_DUE ? '贷款到期' : '应收款项催收'}应对方案`;
     const generatedSop = this.generatedSopRepository.create({
       userId,
       templateId: template.templateId,

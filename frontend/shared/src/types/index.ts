@@ -32,7 +32,7 @@ export interface AuthResponse {
 }
 
 // C端资产相关类型
-export type AssetAccountType = 'CASH' | 'DEPOSIT' | 'FUND' | 'STOCK';
+export type AssetAccountType = 'CASH' | 'DEPOSIT' | 'FUND' | 'STOCK' | 'BOND' | 'GOLD' | 'FUTURES' | 'REITS';
 
 export interface UserAssetAccount {
   id: string;
@@ -60,6 +60,20 @@ export interface UserAssetAccount {
   stockCode?: string;
   stockName?: string;
   currentPrice?: number;
+  bondCode?: string;
+  bondName?: string;
+  bondType?: string;
+  maturityDate?: Date;
+  couponRate?: number;
+  goldType?: string;
+  holdWeight?: number;
+  futuresCode?: string;
+  futuresName?: string;
+  margin?: number;
+  contractUnit?: number;
+  reitsCode?: string;
+  reitsName?: string;
+  dividendYield?: number;
 }
 
 export interface AssetOverview {

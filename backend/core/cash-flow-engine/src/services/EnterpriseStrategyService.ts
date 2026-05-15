@@ -8,6 +8,9 @@ export interface EnterpriseQuestionnaire {
   industryRisk: 'A' | 'B' | 'C';
   emergencyFund: 'A' | 'B' | 'C';
   investmentExperience: 'A' | 'B' | 'C';
+  employeeCount: 'A' | 'B' | 'C';
+  receivableRatio: 'A' | 'B' | 'C';
+  taxCompliance: 'A' | 'B' | 'C';
 }
 
 export interface EnterpriseRiskProfile {
@@ -132,9 +135,9 @@ export class EnterpriseStrategyService {
     }
 
     let profile: 'conservative' | 'stable' | 'aggressive';
-    if (score >= 7 && score <= 11) {
+    if (score >= 10 && score <= 16) {
       profile = 'conservative';
-    } else if (score >= 12 && score <= 16) {
+    } else if (score >= 17 && score <= 23) {
       profile = 'stable';
     } else {
       profile = 'aggressive';

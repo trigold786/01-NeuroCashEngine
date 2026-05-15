@@ -13,7 +13,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Page } from '../App';
-import { strategyApi, Product, Recommendation, InvestmentStrategy, FundamentalAnalysis, TechnicalAnalysis } from '@nce/shared/src/api/strategy';
+import { strategyApi, Product, Recommendation, InvestmentStrategy, FundamentalAnalysis, TechnicalAnalysis } from '@nce/shared';
 import { CardSkeleton, StepSkeleton } from '../components/LoadingSkeleton';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, RadialLinearScale, PointElement, Filler, Title, Tooltip, Legend);
@@ -68,6 +68,33 @@ const QUESTIONS = [
       { value: 'C', label: 'C. 高收益' },
     ],
   },
+  {
+    id: 'q6',
+    text: '您的家庭年收入（税后）？',
+    options: [
+      { value: 'A', label: 'A. <10万' },
+      { value: 'B', label: 'B. 10-30万' },
+      { value: 'C', label: 'C. >30万' },
+    ],
+  },
+  {
+    id: 'q7',
+    text: '您是否有稳定的收入来源？',
+    options: [
+      { value: 'A', label: 'A. 不稳定/无固定收入' },
+      { value: 'B', label: 'B. 较为稳定' },
+      { value: 'C', label: 'C. 非常稳定且有多来源' },
+    ],
+  },
+  {
+    id: 'q8',
+    text: '您对投资知识的了解程度？',
+    options: [
+      { value: 'A', label: 'A. 几乎不了解' },
+      { value: 'B', label: 'B. 了解基础知识' },
+      { value: 'C', label: 'C. 深入理解市场' },
+    ],
+  },
 ];
 
 const RISK_PROFILE_NAMES: Record<string, string> = {
@@ -103,7 +130,7 @@ export default function Strategy({ navigateTo }: StrategyProps) {
   };
 
   const canProceedToStep2 = () => {
-    return Object.keys(answers).length === 5;
+    return Object.keys(answers).length === 8;
   };
 
   const handleCalculateRisk = async () => {
@@ -181,9 +208,11 @@ export default function Strategy({ navigateTo }: StrategyProps) {
   const getRadarData = () => {
     const score = (val: string) => val === 'A' ? 25 : val === 'B' ? 50 : 75;
     const reverse = (val: string) => val === 'A' ? 75 : val === 'B' ? 50 : 25;
-    const q1 = answers['q1'], q2 = answers['q2'], q3 = answers['q3'], q4 = answers['q4'], q5 = answers['q5'];
+    const q1 = answers['q1'] || 'B', q2 = answers['q2'] || 'B', q3 = answers['q3'] || 'B';
+    const q4 = answers['q4'] || 'B', q5 = answers['q5'] || 'B', q6 = answers['q6'] || 'B';
+    const q7 = answers['q7'] || 'B', q8 = answers['q8'] || 'B';
     return {
-      labels: ['风险偏好', '流动性需求', '投资经验', '风险承受', '收益预期'],
+      labels: ['风险偏好', '流动性需求', '投资经验', '风险承受', '收益预期', '收入水平', '收入稳定性', '知识水平'],
       datasets: [
         {
           label: '风险画像',
@@ -193,6 +222,9 @@ export default function Strategy({ navigateTo }: StrategyProps) {
             score(q2),
             score(q3),
             Math.round((score(q4) + score(q5)) / 2),
+            score(q6),
+            score(q7),
+            score(q8),
           ],
           backgroundColor: 'rgba(0, 102, 204, 0.2)',
           borderColor: '#0066cc',
@@ -265,7 +297,7 @@ export default function Strategy({ navigateTo }: StrategyProps) {
         boxShadow: 'var(--shadow-card)',
       }}>
         <h2 style={{ marginTop: 0, marginBottom: '24px' }}>风险评估问卷</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>请回答以下5个问题，我们将为您推荐合适的投资策略。</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>请回答以下8个问题，我们将为您推荐合适的投资策略。</p>
 
         {QUESTIONS.map((question, index) => (
           <div key={question.id} style={{ marginBottom: '24px' }}>

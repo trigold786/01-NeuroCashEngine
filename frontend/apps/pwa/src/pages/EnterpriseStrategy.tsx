@@ -11,7 +11,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Page } from '../App';
-import { strategyApi, EnterpriseRiskProfile, EnterpriseProduct, EnterprisePortfolioMetrics, EnterpriseStrategyTemplate } from '@nce/shared/src/api/strategy';
+import { strategyApi, EnterpriseRiskProfile, EnterpriseProduct, EnterprisePortfolioMetrics, EnterpriseStrategyTemplate } from '@nce/shared';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -22,9 +22,9 @@ interface EnterpriseStrategyProps {
 const QUESTIONS = [
   { id: 'revenueScale', text: '企业年营收规模？', label: '营收规模',
     options: [
-      { value: 'A', label: 'A. < 500万' },
-      { value: 'B', label: 'B. 500万 - 2000万' },
-      { value: 'C', label: 'C. > 2000万' },
+      { value: 'A', label: 'A. < 100万' },
+      { value: 'B', label: 'B. 100万 - 500万' },
+      { value: 'C', label: 'C. > 500万' },
     ],
   },
   { id: 'debtRatio', text: '企业负债率？', label: '负债率',
@@ -48,16 +48,16 @@ const QUESTIONS = [
       { value: 'C', label: 'C. > 3年' },
     ],
   },
-  { id: 'industryRisk', text: '所处行业风险等级？', label: '行业风险',
+  { id: 'industryRisk', text: '所属行业（参考GB/T 4754-2017）？', label: '行业分类',
     options: [
-      { value: 'A', label: 'A. 低风险（如公用事业）' },
-      { value: 'B', label: 'B. 中等风险（如制造业）' },
-      { value: 'C', label: 'C. 高风险（如科技初创）' },
+      { value: 'A', label: 'A. 低风险（F批发零售/居民服务）' },
+      { value: 'B', label: 'B. 中等风险（C制造业/I信息技术）' },
+      { value: 'C', label: 'C. 高风险（K房地产/M科研服务）' },
     ],
   },
   { id: 'emergencyFund', text: '企业是否设有应急储备金？', label: '应急储备',
     options: [
-      { value: 'A', label: 'A. 是，充足' },
+      { value: 'A', label: 'A. 是，可覆盖3月以上开支' },
       { value: 'B', label: 'B. 部分储备' },
       { value: 'C', label: 'C. 没有储备' },
     ],
@@ -67,6 +67,27 @@ const QUESTIONS = [
       { value: 'A', label: 'A. 无投资经验' },
       { value: 'B', label: 'B. 有一些经验' },
       { value: 'C', label: 'C. 经验丰富' },
+    ],
+  },
+  { id: 'employeeCount', text: '企业员工人数？', label: '人员规模',
+    options: [
+      { value: 'A', label: 'A. 1-5人' },
+      { value: 'B', label: 'B. 6-20人' },
+      { value: 'C', label: 'C. >20人' },
+    ],
+  },
+  { id: 'receivableRatio', text: '应收账款占总资产比例？', label: '应收占比',
+    options: [
+      { value: 'A', label: 'A. < 20%' },
+      { value: 'B', label: 'B. 20% - 50%' },
+      { value: 'C', label: 'C. > 50%' },
+    ],
+  },
+  { id: 'taxCompliance', text: '企业税务合规状况？', label: '税务合规',
+    options: [
+      { value: 'A', label: 'A. 完全合规，按时申报' },
+      { value: 'B', label: 'B. 基本合规，偶有延迟' },
+      { value: 'C', label: 'C. 有欠税或处罚记录' },
     ],
   },
 ];
@@ -97,7 +118,7 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
   };
 
-  const canProceed = () => Object.keys(answers).length === 7;
+  const canProceed = () => Object.keys(answers).length === 10;
 
   const handleAssess = async () => {
     setLoading(true);
@@ -180,7 +201,7 @@ export default function EnterpriseStrategy({ navigateTo }: EnterpriseStrategyPro
     <div>
       <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
         <h2 style={{ marginTop: 0, marginBottom: '24px' }}>企业风险评估问卷</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>请回答以下7个问题，我们将为企业推荐合适的投资策略。</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>请回答以下10个问题，我们将为企业推荐合适的投资策略。</p>
         {QUESTIONS.map((question, index) => (
           <div key={question.id} style={{ marginBottom: '24px' }}>
             <p style={{ fontWeight: '500', marginBottom: '12px' }}>{index + 1}. {question.text}</p>
