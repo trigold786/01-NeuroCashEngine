@@ -157,6 +157,15 @@ services:
     networks:
       - nce-network
 
+  aktools:
+    image: lev1s/aktools:latest
+    container_name: nce-aktools
+    expose:
+      - "8080"
+    restart: unless-stopped
+    networks:
+      - nce-network
+
 volumes:
   postgres-data:
   redis-data:
