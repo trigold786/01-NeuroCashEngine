@@ -304,7 +304,7 @@ export class BusinessCashFlowService {
 
     let filledContent = template.content;
     if (alertForecast) {
-      filledContent = filledContent.replace(/\{\{predictedBalance\}\}/g, alertForecast.predictedBalance.toFixed(2));
+      filledContent = filledContent.replace(/\{\{predictedBalance\}\}/g, Number(alertForecast.predictedBalance).toFixed(2));
       filledContent = filledContent.replace(/\{\{forecastDate\}\}/g, alertForecast.forecastDate);
       const alertDate = new Date(alertForecast.forecastDate);
       alertDate.setDate(alertDate.getDate() - 3);
@@ -315,7 +315,7 @@ export class BusinessCashFlowService {
       filledContent = filledContent.replace(/\{\{alertDate\}\}/g, new Date().toISOString().split('T')[0]);
     }
     if (latestForecast) {
-      filledContent = filledContent.replace(/\{\{latestBalance\}\}/g, latestForecast.predictedBalance.toFixed(2));
+      filledContent = filledContent.replace(/\{\{latestBalance\}\}/g, Number(latestForecast.predictedBalance).toFixed(2));
     } else {
       filledContent = filledContent.replace(/\{\{latestBalance\}\}/g, '0.00');
     }
