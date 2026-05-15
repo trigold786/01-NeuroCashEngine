@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: docker.m.daocloud.io/traefik:latest
+    image: docker.m.daocloud.io/traefik:v3.3
     container_name: nce-traefik
     ports:
       - "80:80"

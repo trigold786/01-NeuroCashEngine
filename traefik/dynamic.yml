@@ -2,6 +2,8 @@ http:
   routers:
     dashboard:
       rule: "Host(`traefik.localhost`)"
+      entrypoints:
+        - "websecure"
       service: "api@internal"
       middlewares:
         - "auth"
@@ -10,32 +12,20 @@ http:
       rule: "PathPrefix(`/api/`)"
       entrypoints:
         - "websecure"
+      middlewares:
+        - "strip-api-prefix"
       service: "account-center"
       tls: {}
 
-    cashflow-assets-overview:
-      rule: "Path(`/assets/overview`)"
-      entrypoints:
-        - "websecure"
-      service: "cashflow"
-      tls: {}
-
-    cashflow-assets-accounts:
-      rule: "Path(`/assets/accounts`)"
-      entrypoints:
-        - "websecure"
-      service: "cashflow"
-      tls: {}
-
     cashflow:
-      rule: "PathPrefix(`/cashflow/`) || PathPrefix(`/business/`) || PathPrefix(`/strategy/`) || PathPrefix(`/enterprise/`) || PathPrefix(`/nsi/`) || PathPrefix(`/subscription/`) || Path(`/notifications`) || PathPrefix(`/points/`) || Path(`/config`) || Path(`/products`)"
+      rule: "PathPrefix(`/assets/`) || PathPrefix(`/cashflow/`) || PathPrefix(`/business/`) || PathPrefix(`/strategy/`) || PathPrefix(`/enterprise/`) || PathPrefix(`/nsi/`) || PathPrefix(`/subscription/`) || Path(`/notifications`) || PathPrefix(`/points/`) || Path(`/config`) || Path(`/products`)"
       entrypoints:
         - "websecure"
       service: "cashflow"
       tls: {}
 
     content-hub:
-      rule: "Path(`/news`)"
+      rule: "Path(`/news`) || PathPrefix(`/news/`)"
       entrypoints:
         - "websecure"
       service: "content-hub"
@@ -95,6 +85,11 @@ http:
       basicAuth:
         users:
           - "admin:$$2y$$10$$xxxxxxxxxxx"
+
+    strip-api-prefix:
+      stripPrefix:
+        prefixes:
+          - "/api"
 
     strip-dp-prefix:
       stripPrefix:
