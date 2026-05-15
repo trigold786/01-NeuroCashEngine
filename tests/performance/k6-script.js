@@ -31,13 +31,13 @@ export default function () {
       headers: { 'Content-Type': 'application/json' },
     });
     loginTrend.add(res.timings.duration);
-    failureRate.add(res.status !== 201);
+    failureRate.add(res.status !== 200);
     check(res, {
-      'login status 201': (r) => r.status === 201,
-      'login has token': (r) => r.json('access_token') !== undefined,
+      'login status 200': (r) => r.status === 200,
+      'login has token': (r) => r.json('accessToken') !== undefined,
     });
-    if (res.status === 201) {
-      const token = res.json('access_token');
+    if (res.status === 200) {
+      const token = res.json('accessToken');
       sleep(1);
 
       group('Asset Overview', () => {
