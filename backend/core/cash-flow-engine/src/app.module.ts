@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
+import { HttpModule } from '@nestjs/axios';
+import { APP_GUARD } from '@nestjs/core';
 import { UserAssetAccount } from './entities/UserAssetAccount.entity';
 import { CashFlowRecord } from './entities/CashFlowRecord.entity';
 import { InvestmentProduct } from './entities/InvestmentProduct.entity';
@@ -33,6 +35,7 @@ import { NotificationService } from './services/NotificationService';
 import { ConfigService } from './services/ConfigService';
 import { FileStorageService } from './services/FileStorageService';
 import { SubscriptionService } from './services/SubscriptionService';
+import { MarketDataService } from './services/MarketDataService';
 import { PermissionGuard } from './guards/PermissionGuard.guard';
 import { AssetController } from './controllers/AssetController';
 import { CashFlowController } from './controllers/CashFlowController';
@@ -52,6 +55,7 @@ import { SubscriptionController } from './controllers/SubscriptionController';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MulterModule.register({ dest: './uploads' }),
+    HttpModule.register({ timeout: 10000 }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
@@ -70,7 +74,7 @@ import { SubscriptionController } from './controllers/SubscriptionController';
     }),
     TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent, Points, PointsRecord, ReferralCode, Notification, SystemConfig, FileRecord, Subscription, InvestmentProduct]),
   ],
-  providers: [AssetService, CashFlowService, CashFlowRecordService, InvestmentProductService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService, PortfolioMonitoringService, PointsService, NSICoordinationService, NotificationService, ConfigService, FileStorageService, SubscriptionService],
+  providers: [AssetService, CashFlowService, CashFlowRecordService, InvestmentProductService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService, PortfolioMonitoringService, PointsService, NSICoordinationService, SchedulerService, NotificationService, ConfigService, FileStorageService, SubscriptionService, MarketDataService, { provide: APP_GUARD, useClass: PermissionGuard }],
   controllers: [AssetController, CashFlowController, InvestmentProductController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController, PortfolioMonitoringController, PointsController, NSICoordinationController, NotificationController, ConfigController, FileStorageController, SubscriptionController],
 })
 export class AppModule {}
