@@ -170,6 +170,8 @@ export class NewsService {
   }
 
   async getNewsById(id: string): Promise<News> {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) throw new NotFoundException('News not found');
     const news = await this.newsRepository.findOne({ where: { id } });
     if (!news) throw new NotFoundException('News not found');
 

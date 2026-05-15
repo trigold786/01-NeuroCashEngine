@@ -130,7 +130,7 @@ describe('NewsService', () => {
   describe('getNewsById', () => {
     it('should return news with incremented view count', async () => {
       const mockNews = {
-        id: 'news-1',
+        id: '550e8400-e29b-41d4-a716-446655440000',
         title: 'Test News',
         viewCount: 10,
       };
@@ -138,17 +138,21 @@ describe('NewsService', () => {
       mockRepository.findOne.mockResolvedValue(mockNews);
       mockRepository.increment.mockResolvedValue({ affected: 1 });
 
-      const result = await service.getNewsById('news-1');
+      const result = await service.getNewsById('550e8400-e29b-41d4-a716-446655440000');
 
-      expect(result.id).toBe('news-1');
+      expect(result.id).toBe('550e8400-e29b-41d4-a716-446655440000');
       expect(result.viewCount).toBe(11);
-      expect(mockRepository.increment).toHaveBeenCalledWith({ id: 'news-1' }, 'viewCount', 1);
+      expect(mockRepository.increment).toHaveBeenCalledWith({ id: '550e8400-e29b-41d4-a716-446655440000' }, 'viewCount', 1);
     });
 
     it('should throw NotFoundException when news not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.getNewsById('non-existent')).rejects.toThrow(NotFoundException);
+      await expect(service.getNewsById('550e8400-e29b-41d4-a716-446655440001')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw NotFoundException for invalid UUID format', async () => {
+      await expect(service.getNewsById('not-a-uuid')).rejects.toThrow(NotFoundException);
     });
   });
 });

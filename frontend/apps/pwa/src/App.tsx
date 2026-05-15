@@ -16,6 +16,8 @@ import PointsCenter from './pages/PointsCenter';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import ApiPlayground from './pages/ApiPlayground';
+import Subscription from './pages/Subscription';
+import NotificationCenter from './pages/NotificationCenter';
 import ThemeToggle from './components/ThemeToggle';
 import AlertBanner from './components/AlertBanner';
 import UserSettings from './pages/UserSettings';
@@ -99,6 +101,10 @@ function App() {
         return <TermsPage navigateTo={setCurrentPage} />;
       case 'user-settings':
         return <UserSettings navigateTo={setCurrentPage} currentTheme={currentTheme} onToggleTheme={toggleTheme} />;
+      case 'subscription':
+        return <Subscription navigateTo={setCurrentPage} />;
+      case 'notifications':
+        return <NotificationCenter navigateTo={setCurrentPage} />;
       case 'api-playground':
         return <ApiPlayground navigateTo={setCurrentPage} />;
       default:

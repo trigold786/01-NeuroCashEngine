@@ -175,7 +175,7 @@ describe('BusinessCashFlowController', () => {
       await controller.exportSopPdf('sop-1', req, mockRes);
 
       expect(mockSopExportService.generatePdf).toHaveBeenCalledWith('sop-1', 'user-1');
-      expect(mockRes.setHeader).toHaveBeenCalledWith('Content-Type', 'text/html');
+      expect(mockRes.setHeader).toHaveBeenCalledWith('Content-Type', 'text/html; charset=utf-8');
       expect(mockRes.send).toHaveBeenCalledWith(mockHtml);
     });
   });
@@ -194,7 +194,7 @@ describe('BusinessCashFlowController', () => {
       await controller.exportSopMarkdown('sop-1', req, mockRes);
 
       expect(mockSopExportService.generateMarkdown).toHaveBeenCalledWith('sop-1', 'user-1');
-      expect(mockRes.setHeader).toHaveBeenCalledWith('Content-Type', 'text/markdown');
+      expect(mockRes.setHeader).toHaveBeenCalledWith('Content-Type', 'text/markdown; charset=utf-8');
       expect(mockRes.send).toHaveBeenCalledWith(mockMarkdown);
     });
   });
