@@ -19,7 +19,6 @@ async function bootstrap() {
   await businessService.initializeSopTemplates();
 
   const schedulerService = app.get(SchedulerService);
-  schedulerService.startDataRefresh('demo-user-1', 60);
   
   await app.listen(3005);
   console.log('Cash Flow Engine is running on port 3005');

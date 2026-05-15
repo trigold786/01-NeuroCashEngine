@@ -2,9 +2,9 @@ import axios, { AxiosError, AxiosInstance } from 'axios';
 
 // 服务基础URL配置
 const SERVICE_BASE_URLS = {
-  ACCOUNT: (import.meta as any).env?.VITE_ACCOUNT_API_URL || 'http://localhost:3001',
-  CASHFLOW: (import.meta as any).env?.VITE_CASHFLOW_API_URL || 'http://localhost:3005',
-  CONTENT: (import.meta as any).env?.VITE_CONTENT_API_URL || 'http://localhost:3006',
+  ACCOUNT: (import.meta as any).env?.VITE_ACCOUNT_API_URL || '/api',
+  CASHFLOW: (import.meta as any).env?.VITE_CASHFLOW_API_URL || '',
+  CONTENT: (import.meta as any).env?.VITE_CONTENT_API_URL || '',
 };
 
 // 创建通用API客户端工厂

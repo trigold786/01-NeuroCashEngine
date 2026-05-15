@@ -12,7 +12,7 @@ import {
   Filler,
 } from 'chart.js';
 import { Page } from '../App';
-import { portfolioApi, PortfolioSummary, Holding, Alert, PortfolioPerformance } from '@nce/shared/src/api/portfolio';
+import { portfolioApi, PortfolioSummary, Holding, Alert, PortfolioPerformance } from '@nce/shared';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 

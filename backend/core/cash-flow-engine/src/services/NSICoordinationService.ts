@@ -77,7 +77,15 @@ export class NSICoordinationService {
   async getUserProfile(userId: string): Promise<NSIUserProfile> {
     const profile = MOCK_PROFILES[userId];
     if (!profile) {
-      throw new NotFoundException(`NSI profile not found for user: ${userId}`);
+      return {
+        userId,
+        socialInsuranceStatus: 'active',
+        medicalInsuranceStatus: 'active',
+        pensionYears: 10,
+        monthlyContribution: 2500,
+        coverageLevel: 'basic',
+        riskProfileModifier: 0,
+      };
     }
     this.logger.log(`Retrieved NSI profile for user ${userId}`);
     return profile;

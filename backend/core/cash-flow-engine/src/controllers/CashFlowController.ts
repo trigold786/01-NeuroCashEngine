@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Param, Body, Req, Query, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Req, Query, Logger, UseGuards } from '@nestjs/common';
 import { CashFlowService } from '../services/CashFlowService';
 import { CashFlowRecordService, StatisticsResult } from '../services/CashFlowRecordService';
 import { CreateCashFlowRecordDto } from '../dto/CreateCashFlowRecord.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('cashflow')
+@UseGuards(JwtAuthGuard)
 export class CashFlowController {
   private readonly logger = new Logger(CashFlowController.name);
 

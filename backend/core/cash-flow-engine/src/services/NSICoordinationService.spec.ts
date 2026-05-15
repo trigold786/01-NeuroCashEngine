@@ -31,8 +31,11 @@ describe('NSICoordinationService', () => {
       expect(profile.riskProfileModifier).toBe(2);
     });
 
-    it('should throw for unknown user', async () => {
-      await expect(service.getUserProfile('unknown')).rejects.toThrow();
+    it('should return default profile for unknown user', async () => {
+      const profile = await service.getUserProfile('unknown');
+      expect(profile.socialInsuranceStatus).toBe('active');
+      expect(profile.medicalInsuranceStatus).toBe('active');
+      expect(profile.coverageLevel).toBe('basic');
     });
   });
 

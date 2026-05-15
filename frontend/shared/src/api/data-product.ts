@@ -2,12 +2,17 @@ import axios from 'axios';
 import { InvestmentSentiment, AssetCategory, DataProductResponse } from '../types';
 
 const dataProductApiClient = axios.create({
-  baseURL: (import.meta as any).env.VITE_DATA_PRODUCT_API_URL || 'http://localhost:3007',
+  baseURL: (import.meta as any).env.VITE_DATA_PRODUCT_API_URL || '/dp',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+dataProductApiClient.interceptors.response.use(
+  (response) => response.data,
+  (error) => Promise.reject(error),
+);
 
 export interface GetInvestmentSentimentParams {
   startDate?: string;
