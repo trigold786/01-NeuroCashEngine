@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useAuthStore, AccountType } from '@nce/shared';
+import React, { useState, useEffect } from 'react';
+import { useAuthStore, AccountType, cashflowApiClient } from '@nce/shared';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -12,7 +12,17 @@ export default function Register() {
     industryCode: '',
     industryName: '',
   });
+  const [referralCode, setReferralCode] = useState('');
   const { register, isLoading, error, clearError } = useAuthStore();
+
+  // 检测URL中的推荐码参数
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref && ref.length === 8) {
+      setReferralCode(ref);
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -23,6 +33,11 @@ export default function Register() {
     e.preventDefault();
     clearError();
     await register(formData);
+    if (referralCode) {
+      try {
+        await cashflowApiClient.post('/points/referral/redeem', { code: referralCode });
+      } catch { /* ignore referral errors */ }
+    }
   };
 
   return (

@@ -1,13 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 import { News, NewsCategory, NewsSourceType } from '../entities/News.entity';
 
 @Injectable()
 export class NewsService {
+  private readonly logger = new Logger(NewsService.name);
+
   constructor(
     @InjectRepository(News)
     private readonly newsRepository: Repository<News>,
+    private readonly http: HttpService,
   ) {}
 
   async seedDemoData(): Promise<void> {
@@ -95,6 +100,30 @@ export class NewsService {
     }
   }
 
+  async validateLink(url: string): Promise<boolean> {
+    if (!url) return false;
+    try {
+      const { status } = await firstValueFrom(
+        this.http.head(url, { timeout: 5000 })
+      );
+      return status >= 200 && status < 400;
+    } catch {
+      return false;
+    }
+  }
+
+  async validateAllLinks(): Promise<{ total: number; valid: number; invalid: number }> {
+    const newsList = await this.newsRepository.find({ select: ['id', 'sourceUrl'] });
+    let valid = 0, invalid = 0;
+    for (const item of newsList) {
+      const isValid = await this.validateLink(item.sourceUrl);
+      await this.newsRepository.update(item.id, { isLinkValid: isValid });
+      if (isValid) valid++; else invalid++;
+    }
+    this.logger.log(`Link validation: ${valid} valid, ${invalid} invalid out of ${newsList.length} total`);
+    return { total: newsList.length, valid, invalid };
+  }
+
   async getNewsList(
     category?: NewsCategory,
     sourceType?: NewsSourceType,
@@ -121,6 +150,7 @@ export class NewsService {
     }
 
     const [list, total] = await queryBuilder
+      .andWhere('news.isLinkValid = :isLinkValid', { isLinkValid: true })
       .orderBy('news.createdAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)

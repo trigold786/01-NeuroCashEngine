@@ -61,6 +61,9 @@ export class News {
   @Column({ type: 'boolean', default: false })
   isVerified: boolean;
 
+  @Column({ type: 'boolean', default: true })
+  isLinkValid: boolean; // 发布前验证sourceUrl是否可达
+
   @CreateDateColumn()
   createdAt: Date;
 

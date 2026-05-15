@@ -1,9 +1,11 @@
-import { Controller, Get, Param, Query, OnModuleInit } from '@nestjs/common';
+import { Controller, Get, Param, Query, Post, OnModuleInit, Logger } from '@nestjs/common';
 import { NewsService } from '../services/NewsService';
 import { NewsCategory, NewsSourceType } from '../entities/News.entity';
 
 @Controller('news')
 export class NewsController implements OnModuleInit {
+  private readonly logger = new Logger(NewsController.name);
+
   constructor(private readonly newsService: NewsService) {}
 
   async onModuleInit() {
@@ -30,6 +32,13 @@ export class NewsController implements OnModuleInit {
       parseInt(page),
       parseInt(limit),
     );
+  }
+
+  @Post('validate-links')
+  async validateLinks() {
+    const result = await this.newsService.validateAllLinks();
+    this.logger.log(`Manual link validation triggered: ${JSON.stringify(result)}`);
+    return result;
   }
 
   @Get(':id')

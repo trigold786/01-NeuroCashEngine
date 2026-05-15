@@ -88,6 +88,15 @@ export default function PointsCenter({ navigateTo }: PointsCenterProps) {
     setMessage('推荐码已复制！');
   };
 
+  const referralLink = referralCode ? `${window.location.origin}/?ref=${referralCode.code}` : '';
+
+  const copyReferralLink = () => {
+    if (referralLink) {
+      navigator.clipboard.writeText(referralLink);
+      setMessage('推荐链接已复制！分享给好友，点击即可注册并自动关联');
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -170,6 +179,21 @@ export default function PointsCenter({ navigateTo }: PointsCenterProps) {
             >
               生成推荐码
             </button>
+          )}
+          {referralCode && (
+            <div style={{ marginTop: '12px', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '6px' }}>
+              <p style={{ margin: '0 0 8px', fontSize: '12px', color: 'var(--text-secondary)' }}>推荐链接</p>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input readOnly value={referralLink} style={{
+                  flex: 1, padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px',
+                  fontSize: '12px', background: 'var(--bg-card)', color: 'var(--text-primary)',
+                }} />
+                <button onClick={copyReferralLink} style={{
+                  padding: '8px 12px', backgroundColor: '#0066cc', color: 'white',
+                  border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', whiteSpace: 'nowrap',
+                }}>复制链接</button>
+              </div>
+            </div>
           )}
           <p style={{ color: 'var(--text-tertiary)', fontSize: '12px', margin: '8px 0 0' }}>
             推荐好友注册，您获得100积分，好友获得50积分
