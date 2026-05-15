@@ -54,7 +54,7 @@ export const businessApi = {
   },
 
   async exportPdf(sopId: string): Promise<Blob> {
-    const url = `${(import.meta as any).env?.VITE_CASHFLOW_API_URL || 'http://localhost:3005'}/business/cashflow/sop/${sopId}/export/pdf`;
+    const url = `/business/cashflow/sop/${sopId}/export/pdf`;
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('nce_access_token') || ''}`,

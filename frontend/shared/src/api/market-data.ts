@@ -1,4 +1,4 @@
-import apiClient from './client';
+import { cashflowApiClient } from './client';
 
 export interface StockQuote {
   code: string;
@@ -23,17 +23,17 @@ export interface KLinePoint {
 
 export const getStockQuotes = async (codes: string[]): Promise<StockQuote[]> => {
   if (codes.length === 0) return [];
-  const res = await apiClient.get('/market/stocks', { params: { codes: codes.join(',') } });
+  const res = await cashflowApiClient.get('/market/stocks', { params: { codes: codes.join(',') } });
   return res.data?.data || [];
 };
 
 export const getFundNAVs = async (codes: string[]): Promise<FundNAV[]> => {
   if (codes.length === 0) return [];
-  const res = await apiClient.get('/market/funds', { params: { codes: codes.join(',') } });
+  const res = await cashflowApiClient.get('/market/funds', { params: { codes: codes.join(',') } });
   return res.data?.data || [];
 };
 
 export const getKLine = async (code: string, period = 'daily', days = 90): Promise<KLinePoint[]> => {
-  const res = await apiClient.get('/market/kline', { params: { code, period, days } });
+  const res = await cashflowApiClient.get('/market/kline', { params: { code, period, days } });
   return res.data?.data || [];
 };
