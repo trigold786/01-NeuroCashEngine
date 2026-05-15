@@ -18,7 +18,7 @@ http:
       tls: {}
 
     cashflow:
-      rule: "PathPrefix(`/assets/`) || PathPrefix(`/cashflow/`) || PathPrefix(`/business/`) || PathPrefix(`/strategy/`) || PathPrefix(`/enterprise/`) || PathPrefix(`/market/`) || PathPrefix(`/nsi/`) || PathPrefix(`/subscription/`) || Path(`/notifications`) || PathPrefix(`/points/`) || Path(`/config`) || Path(`/products`)"
+      rule: "PathPrefix(`/assets/overview`) || PathPrefix(`/assets/accounts`) || PathPrefix(`/cashflow/`) || PathPrefix(`/business/`) || PathPrefix(`/strategy/`) || PathPrefix(`/enterprise/`) || PathPrefix(`/market/`) || PathPrefix(`/nsi/`) || PathPrefix(`/subscription/`) || Path(`/notifications`) || PathPrefix(`/points/`) || Path(`/config`) || Path(`/products`)"
       entrypoints:
         - "websecure"
       service: "cashflow"
