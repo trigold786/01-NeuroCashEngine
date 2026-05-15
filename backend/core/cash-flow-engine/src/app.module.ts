@@ -36,6 +36,7 @@ import { ConfigService } from './services/ConfigService';
 import { FileStorageService } from './services/FileStorageService';
 import { SubscriptionService } from './services/SubscriptionService';
 import { MarketDataService } from './services/MarketDataService';
+import { MarketDataController } from './controllers/MarketDataController';
 import { PermissionGuard } from './guards/PermissionGuard.guard';
 import { AssetController } from './controllers/AssetController';
 import { CashFlowController } from './controllers/CashFlowController';
@@ -75,6 +76,6 @@ import { SubscriptionController } from './controllers/SubscriptionController';
     TypeOrmModule.forFeature([UserAssetAccount, CashFlowRecord, CashFlowForecast, SopTemplate, GeneratedSop, IndustryClassification, CashFlowEvent, Points, PointsRecord, ReferralCode, Notification, SystemConfig, FileRecord, Subscription, InvestmentProduct]),
   ],
   providers: [AssetService, CashFlowService, CashFlowRecordService, InvestmentProductService, BusinessCashFlowService, SopExportService, StrategyService, EnterpriseStrategyService, PortfolioMonitoringService, PointsService, NSICoordinationService, SchedulerService, NotificationService, ConfigService, FileStorageService, SubscriptionService, MarketDataService, { provide: APP_GUARD, useClass: PermissionGuard }],
-  controllers: [AssetController, CashFlowController, InvestmentProductController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController, PortfolioMonitoringController, PointsController, NSICoordinationController, NotificationController, ConfigController, FileStorageController, SubscriptionController],
+  controllers: [AssetController, CashFlowController, InvestmentProductController, BusinessCashFlowController, StrategyController, EnterpriseStrategyController, PortfolioMonitoringController, PointsController, NSICoordinationController, NotificationController, ConfigController, FileStorageController, SubscriptionController, MarketDataController],
 })
 export class AppModule {}
