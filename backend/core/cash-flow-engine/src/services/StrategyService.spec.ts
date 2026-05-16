@@ -29,48 +29,47 @@ describe('StrategyService', () => {
   });
 
   describe('calculateRiskProfile', () => {
-    it('should return conservative for score 5-8', () => {
-      expect(service.calculateRiskProfile(5)).toBe('conservative');
-      expect(service.calculateRiskProfile(6)).toBe('conservative');
-      expect(service.calculateRiskProfile(7)).toBe('conservative');
+    it('should return conservative for score 8-13', () => {
       expect(service.calculateRiskProfile(8)).toBe('conservative');
+      expect(service.calculateRiskProfile(10)).toBe('conservative');
+      expect(service.calculateRiskProfile(13)).toBe('conservative');
     });
 
-    it('should return moderate for score 9-12', () => {
-      expect(service.calculateRiskProfile(9)).toBe('moderate');
-      expect(service.calculateRiskProfile(10)).toBe('moderate');
-      expect(service.calculateRiskProfile(11)).toBe('moderate');
-      expect(service.calculateRiskProfile(12)).toBe('moderate');
+    it('should return moderate for score 14-19', () => {
+      expect(service.calculateRiskProfile(14)).toBe('moderate');
+      expect(service.calculateRiskProfile(16)).toBe('moderate');
+      expect(service.calculateRiskProfile(19)).toBe('moderate');
     });
 
-    it('should return aggressive for score 13-15', () => {
-      expect(service.calculateRiskProfile(13)).toBe('aggressive');
-      expect(service.calculateRiskProfile(14)).toBe('aggressive');
-      expect(service.calculateRiskProfile(15)).toBe('aggressive');
+    it('should return aggressive for score 20-24', () => {
+      expect(service.calculateRiskProfile(20)).toBe('aggressive');
+      expect(service.calculateRiskProfile(22)).toBe('aggressive');
+      expect(service.calculateRiskProfile(24)).toBe('aggressive');
     });
 
     it('should return conservative for invalid score', () => {
       expect(service.calculateRiskProfile(0)).toBe('conservative');
-      expect(service.calculateRiskProfile(20)).toBe('conservative');
+      expect(service.calculateRiskProfile(5)).toBe('conservative');
+      expect(service.calculateRiskProfile(30)).toBe('conservative');
     });
   });
 
   describe('calculateRiskScore', () => {
     it('should calculate score from A/B/C answers and return profile', () => {
-      const result = service.calculateRiskScore({ q1: 'A', q2: 'B', q3: 'C', q4: 'A', q5: 'B' });
-      expect(result.score).toBe(1 + 2 + 3 + 1 + 2);
+      const result = service.calculateRiskScore({ q1: 'A', q2: 'B', q3: 'C', q4: 'A', q5: 'B', q6: 'A', q7: 'B', q8: 'C' });
+      expect(result.score).toBe(1 + 2 + 3 + 1 + 2 + 1 + 2 + 3);
       expect(result.riskProfile).toBe('moderate');
     });
 
-    it('should return score 5 for all A answers (conservative)', () => {
-      const result = service.calculateRiskScore({ q1: 'A', q2: 'A', q3: 'A', q4: 'A', q5: 'A' });
-      expect(result.score).toBe(5);
+    it('should return score 8 for all A answers (conservative)', () => {
+      const result = service.calculateRiskScore({ q1: 'A', q2: 'A', q3: 'A', q4: 'A', q5: 'A', q6: 'A', q7: 'A', q8: 'A' });
+      expect(result.score).toBe(8);
       expect(result.riskProfile).toBe('conservative');
     });
 
-    it('should return score 15 for all C answers (aggressive)', () => {
-      const result = service.calculateRiskScore({ q1: 'C', q2: 'C', q3: 'C', q4: 'C', q5: 'C' });
-      expect(result.score).toBe(15);
+    it('should return score 24 for all C answers (aggressive)', () => {
+      const result = service.calculateRiskScore({ q1: 'C', q2: 'C', q3: 'C', q4: 'C', q5: 'C', q6: 'C', q7: 'C', q8: 'C' });
+      expect(result.score).toBe(24);
       expect(result.riskProfile).toBe('aggressive');
     });
 

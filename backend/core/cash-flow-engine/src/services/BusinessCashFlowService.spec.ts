@@ -50,7 +50,7 @@ describe('BusinessCashFlowService', () => {
 
   describe('initializeIndustryData', () => {
     it('should not re-initialize if data exists', async () => {
-      mockIndustryRepository.count.mockResolvedValue(6);
+      mockIndustryRepository.count.mockResolvedValue(37);
       await service.initializeIndustryData();
       expect(mockIndustryRepository.count).toHaveBeenCalled();
       expect(mockIndustryRepository.create).not.toHaveBeenCalled();
@@ -61,19 +61,21 @@ describe('BusinessCashFlowService', () => {
       mockIndustryRepository.create.mockReturnValue({});
       mockIndustryRepository.save.mockResolvedValue({});
       await service.initializeIndustryData();
-      expect(mockIndustryRepository.create).toHaveBeenCalledTimes(6);
+      expect(mockIndustryRepository.create).toHaveBeenCalledTimes(37);
     });
   });
 
   describe('initializeSopTemplates', () => {
-    it('should not re-initialize if templates exist', async () => {
-      mockTemplateRepository.count.mockResolvedValue(4);
+    it('should update existing templates without creating new ones', async () => {
+      mockTemplateRepository.findOne.mockResolvedValue({ id: 1, type: SopType.SHORTAGE });
+      mockTemplateRepository.save.mockResolvedValue({});
       await service.initializeSopTemplates();
       expect(mockTemplateRepository.create).not.toHaveBeenCalled();
+      expect(mockTemplateRepository.save).toHaveBeenCalledTimes(4);
     });
 
     it('should initialize templates when empty', async () => {
-      mockTemplateRepository.count.mockResolvedValue(0);
+      mockTemplateRepository.findOne.mockResolvedValue(null);
       mockTemplateRepository.create.mockReturnValue({});
       mockTemplateRepository.save.mockResolvedValue({});
       await service.initializeSopTemplates();

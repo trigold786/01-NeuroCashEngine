@@ -17,7 +17,7 @@ describe('EnterpriseStrategyService', () => {
   });
 
   describe('assessRiskProfile', () => {
-    it('should return conservative for score 7-11 (all A answers)', () => {
+    it('should return conservative for score 10-16 (all A answers)', () => {
       const result = service.assessRiskProfile({
         revenueScale: 'A',
         debtRatio: 'A',
@@ -26,12 +26,15 @@ describe('EnterpriseStrategyService', () => {
         industryRisk: 'A',
         emergencyFund: 'A',
         investmentExperience: 'A',
+        employeeCount: 'A',
+        receivableRatio: 'A',
+        taxCompliance: 'A',
       });
-      expect(result.score).toBe(7);
+      expect(result.score).toBe(10);
       expect(result.profile).toBe('conservative');
     });
 
-    it('should return stable for mixed answers scoring 12', () => {
+    it('should return stable for mixed answers scoring 17', () => {
       const result = service.assessRiskProfile({
         revenueScale: 'C',
         debtRatio: 'B',
@@ -40,13 +43,16 @@ describe('EnterpriseStrategyService', () => {
         industryRisk: 'A',
         emergencyFund: 'A',
         investmentExperience: 'B',
+        employeeCount: 'B',
+        receivableRatio: 'A',
+        taxCompliance: 'B',
       });
-      expect(result.score).toBe(3 + 2 + 1 + 2 + 1 + 1 + 2);
-      expect(result.score).toBe(12);
+      expect(result.score).toBe(3 + 2 + 1 + 2 + 1 + 1 + 2 + 2 + 1 + 2);
+      expect(result.score).toBe(17);
       expect(result.profile).toBe('stable');
     });
 
-    it('should return stable for score 12-16', () => {
+    it('should return stable for score 17-23', () => {
       const result = service.assessRiskProfile({
         revenueScale: 'B',
         debtRatio: 'B',
@@ -55,12 +61,15 @@ describe('EnterpriseStrategyService', () => {
         industryRisk: 'B',
         emergencyFund: 'B',
         investmentExperience: 'B',
+        employeeCount: 'B',
+        receivableRatio: 'B',
+        taxCompliance: 'B',
       });
-      expect(result.score).toBe(14);
+      expect(result.score).toBe(20);
       expect(result.profile).toBe('stable');
     });
 
-    it('should return conservative for score boundary 10', () => {
+    it('should return conservative for score boundary 16', () => {
       const result = service.assessRiskProfile({
         revenueScale: 'B',
         debtRatio: 'A',
@@ -69,13 +78,16 @@ describe('EnterpriseStrategyService', () => {
         industryRisk: 'A',
         emergencyFund: 'A',
         investmentExperience: 'B',
+        employeeCount: 'A',
+        receivableRatio: 'A',
+        taxCompliance: 'B',
       });
-      expect(result.score).toBe(2 + 1 + 1 + 2 + 1 + 1 + 2);
-      expect(result.score).toBe(10);
+      expect(result.score).toBe(2 + 1 + 1 + 2 + 1 + 1 + 2 + 1 + 1 + 2);
+      expect(result.score).toBe(14);
       expect(result.profile).toBe('conservative');
     });
 
-    it('should return aggressive for score 17-21 (all C answers)', () => {
+    it('should return aggressive for score 24-30 (all C answers)', () => {
       const result = service.assessRiskProfile({
         revenueScale: 'C',
         debtRatio: 'C',
@@ -84,12 +96,15 @@ describe('EnterpriseStrategyService', () => {
         industryRisk: 'C',
         emergencyFund: 'C',
         investmentExperience: 'C',
+        employeeCount: 'C',
+        receivableRatio: 'C',
+        taxCompliance: 'C',
       });
-      expect(result.score).toBe(21);
+      expect(result.score).toBe(30);
       expect(result.profile).toBe('aggressive');
     });
 
-    it('should return aggressive for score boundary 17', () => {
+    it('should return aggressive for score boundary 24', () => {
       const result = service.assessRiskProfile({
         revenueScale: 'C',
         debtRatio: 'C',
@@ -98,9 +113,12 @@ describe('EnterpriseStrategyService', () => {
         industryRisk: 'C',
         emergencyFund: 'A',
         investmentExperience: 'C',
+        employeeCount: 'C',
+        receivableRatio: 'C',
+        taxCompliance: 'C',
       });
-      expect(result.score).toBe(3 + 3 + 3 + 1 + 3 + 1 + 3);
-      expect(result.score).toBe(17);
+      expect(result.score).toBe(3 + 3 + 3 + 1 + 3 + 1 + 3 + 3 + 3 + 3);
+      expect(result.score).toBe(26);
       expect(result.profile).toBe('aggressive');
     });
 
@@ -113,9 +131,12 @@ describe('EnterpriseStrategyService', () => {
         industryRisk: 'A',
         emergencyFund: 'B',
         investmentExperience: 'C',
+        employeeCount: 'B',
+        receivableRatio: 'A',
+        taxCompliance: 'C',
       });
-      expect(result.score).toBe(1 + 3 + 2 + 3 + 1 + 2 + 3);
-      expect(result.score).toBe(15);
+      expect(result.score).toBe(1 + 3 + 2 + 3 + 1 + 2 + 3 + 2 + 1 + 3);
+      expect(result.score).toBe(21);
       expect(result.profile).toBe('stable');
     });
   });
